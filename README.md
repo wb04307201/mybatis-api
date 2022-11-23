@@ -27,18 +27,18 @@
 ```xml
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
-        <artifactId>mybatis-json-api-spring-boot-starter</artifactId>
-        <version>1.0.2</version>
+        <artifactId>mybatis-api-spring-boot-starter</artifactId>
+        <version>1.0.0</version>
     </dependency>
 ```
 
 ## 第三步 在启动类上加上`@EnableFilePreview`注解
 
 ```java
-@EnableMyBatisJsonApi
+@EnableMyBatisApi
 @SpringBootApplication
 @MapperScan({"cn.wubo.demo"})
-public class MybatisJsonApiDemoApplication {
+public class MybatisApiDemoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MybatisJsonApiDemoApplication.class, args);
@@ -52,10 +52,10 @@ public class MybatisJsonApiDemoApplication {
 ```java
 @RestController
 @RequestMapping(value = "/api")
-public class MybatisJsonApiController {
+public class MybatisApiController {
 
     @Resource
-    MyBatisJsonApiService service;
+    MyBatisApiService service;
 
     @PostMapping(value = "/{method}/{tableName}")
     public String parse(
@@ -69,7 +69,7 @@ public class MybatisJsonApiController {
 ```
 
 ## <h2 id="2">2.示例<h2/>
-> <a href="https://gitee.com/wb04307201/mybatis-json-api-demo">示例代码</a>
+> <a href="https://gitee.com/wb04307201/mybatis-api-demo">示例代码</a>
 
 ### <h3 id="2.1">2.1 新增<h3/>
 请求:  
