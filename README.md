@@ -41,7 +41,7 @@
 public class MybatisApiDemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MybatisJsonApiDemoApplication.class, args);
+        SpringApplication.run(MybatisApiDemoApplication.class, args);
     }
 
 }
