@@ -60,9 +60,9 @@ public class MyBatisApiService {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
                 return objectMapper.writeValueAsString(objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().map(row -> save(tableName, row)).collect(Collectors.toList()));
+                }).stream().map(row -> saveOrUpdate(tableName, row)).collect(Collectors.toList()));
             } else {
-                return objectMapper.writeValueAsString(save(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                return objectMapper.writeValueAsString(saveOrUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
                 })));
             }
         } catch (JsonProcessingException e) {
@@ -70,7 +70,7 @@ public class MyBatisApiService {
         }
     }
 
-    public Map<String, Object> save(String tableName, Map<String, Object> params) {
+    public Map<String, Object> saveOrUpdate(String tableName, Map<String, Object> params) {
         String id;
         if (!params.containsKey(Constant.ID) || "".equals(params.get(Constant.ID))) {
             id = UUID.randomUUID().toString();
