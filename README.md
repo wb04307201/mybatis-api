@@ -1,6 +1,6 @@
-# mybatis-api-spring-boot-starter mybatis通用接口启动器
+# mybatis-api-spring-boot-starter
 
-基于mybatis,提供万能通用接口，零代码进行增删改查
+> 基于MyBatis提供零代码接口，通过json进行对数据库的增删改查操作
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
 
@@ -28,7 +28,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.0</version>
     </dependency>
 ```
 
@@ -177,23 +177,6 @@ http://localhost:8080/api/select/person
         "DEPTCODE": "deptcode1",
         "ID": "001",
         "NAME": "name1"
-    }
-]
-</code></pre>
-分组查询:  
-http://localhost:8080/api/select/person
-<pre><code class="language-json">{
-    "@column": "deptcode,count(1) as personcount",
-    "@group": [
-        "deptcode"
-    ]
-}
-</code></pre>
-返回:
-<pre><code class="language-json">[
-    {
-        "DEPTCODE": "deptcode1",
-        "PERSONCOUNT": 2
     }
 ]
 </code></pre>
