@@ -24,17 +24,13 @@ public class Builder {
 
     public String insert(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().INSERT_INTO(tableName);
-        params.forEach((k, v) -> {
-            if (!k.startsWith(Constant.AT)) sql.VALUES(k, getValueStr(v));
-        });
+        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(entry.getKey(), getValueStr(entry.getValue())));
         return sql.toString();
     }
 
     public String update(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().UPDATE(tableName);
-        params.forEach((k, v) -> {
-            if (!k.startsWith(Constant.AT)) sql.SET(k + " = " + getValueStr(v));
-        });
+        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(entry.getKey(), getUpdateValueStr(entry.getValue())));
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
         return sql.toString();
     }
@@ -107,7 +103,7 @@ public class Builder {
         if (p.containsKey(Constant.PAGE_SIZE) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_SIZE))) {
             Integer pageSize = (Integer) p.get(Constant.PAGE_SIZE);
             Integer pageIndex = p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (Integer) p.get(Constant.PAGE_INDEX) : 0;
-            sql.OFFSET(pageSize * pageIndex).LIMIT(pageSize);
+            sql.OFFSET((long) pageSize * pageIndex).LIMIT(pageSize);
         }
     }
 
@@ -118,6 +114,12 @@ public class Builder {
 
     private Optional<Map.Entry<String, Object>> findAny(Map<String, Object> params, String key) {
         return params.entrySet().stream().filter(entry -> entry.getKey().equals(key)).findAny();
+    }
+
+    private String getUpdateValueStr(Object valueObj) {
+        String str = getValueStr(valueObj);
+        if ("'=null'".equals(valueObj)) return "null";
+        else return str;
     }
 
     private String getValueStr(Object valueObj) {
