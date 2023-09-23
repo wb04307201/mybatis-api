@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class MyBatisApiConfiguration {
 
     @Bean
-    public MyBatisApiService robotService() {
+    public MyBatisApiService myBatisApiService() {
         return new MyBatisApiService();
     }
 
