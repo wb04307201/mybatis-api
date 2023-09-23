@@ -15,7 +15,7 @@ public class MyBatisApiService {
     @Resource
     MyBatisApiMapper mapper;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public String parse(String method, String tableName, String context) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
