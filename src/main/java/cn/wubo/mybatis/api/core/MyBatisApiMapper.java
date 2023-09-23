@@ -12,11 +12,11 @@ public interface MyBatisApiMapper {
     List<Map<String, Object>> select(String tableName, Map<String, Object> params);
 
     @InsertProvider(type = Builder.class, method = "insert")
-    int insert(String tableName, Map<String, Object> params);
+    Integer insert(String tableName, Map<String, Object> params);
 
     @UpdateProvider(type = Builder.class, method = "update")
-    int update(String tableName, Map<String, Object> params);
+    Integer update(String tableName, Map<String, Object> params);
 
     @DeleteProvider(type = Builder.class, method = "delete")
-    int delete(String tableName, Map<String, Object> params);
+    Integer delete(String tableName, Map<String, Object> params);
 }
