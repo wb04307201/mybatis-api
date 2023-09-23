@@ -36,7 +36,7 @@ public class MyBatisApiService {
             }
             return res;
         } catch (JsonProcessingException e) {
-            throw new MyBatisApiException(e);
+            throw new MyBatisApiException(e.getMessage(), e);
         }
     }
 
@@ -44,21 +44,11 @@ public class MyBatisApiService {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
-                return objectMapper.writeValueAsString(
-                        objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                                })
-                                .stream()
-                                .mapToInt(row -> mapper.delete(tableName, row))
-                                .sum()
-                );
+                return objectMapper.writeValueAsString(objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                }).stream().mapToInt(row -> mapper.delete(tableName, row)).sum());
             } else {
-                return objectMapper.writeValueAsString(
-                        mapper.delete(
-                                tableName,
-                                objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                                })
-                        )
-                );
+                return objectMapper.writeValueAsString(mapper.delete(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                })));
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e);
@@ -69,21 +59,11 @@ public class MyBatisApiService {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
-                return objectMapper.writeValueAsString(
-                        objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                                })
-                                .stream()
-                                .map(row -> save(tableName, row))
-                                .collect(Collectors.toList())
-                );
+                return objectMapper.writeValueAsString(objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                }).stream().map(row -> save(tableName, row)).collect(Collectors.toList()));
             } else {
-                return objectMapper.writeValueAsString(
-                        save(
-                                tableName,
-                                objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                                })
-                        )
-                );
+                return objectMapper.writeValueAsString(save(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                })));
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e);
@@ -108,9 +88,6 @@ public class MyBatisApiService {
         Map<String, String> query = new HashMap<>();
         query.put("key", Constant.ID);
         query.put("value", id);
-        return mapper.select(tableName,
-                        Collections.singletonMap(Constant.WHERE,
-                                Collections.singletonList(query)))
-                .get(0);
+        return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
     }
 }

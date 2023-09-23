@@ -1,6 +1,6 @@
 # mybatis-api-spring-boot-starter
 
-> 基于MyBatis提供零代码接口，通过json进行对数据库的增删改查操作
+> 基于mybatis提供万能通用接口，大部分接口不用再写，零码便可进行增删改查
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
 
@@ -37,7 +37,6 @@
 ```java
 @EnableMyBatisApi
 @SpringBootApplication
-@MapperScan({"cn.wubo.demo"})
 public class MybatisApiDemoApplication {
 
     public static void main(String[] args) {
