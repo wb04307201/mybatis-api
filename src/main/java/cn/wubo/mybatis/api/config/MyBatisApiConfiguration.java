@@ -1,6 +1,7 @@
 package cn.wubo.mybatis.api.config;
 
 import cn.wubo.mybatis.api.core.MyBatisApiService;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import static org.springframework.web.servlet.function.RouterFunctions.route;
 
 @Configuration
 @EnableConfigurationProperties({MyBatisApiProperties.class})
+@MapperScan(basePackages = "cn.wubo.mybatis.api.core")
 public class MyBatisApiConfiguration {
 
     MyBatisApiProperties myBatisApiProperties;
