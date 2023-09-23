@@ -28,7 +28,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
 ```
 
@@ -177,6 +177,23 @@ http://localhost:8080/api/select/person
         "DEPTCODE": "deptcode1",
         "ID": "001",
         "NAME": "name1"
+    }
+]
+</code></pre>
+分组查询:  
+http://localhost:8080/api/select/person
+<pre><code class="language-json">{
+    "@column": "deptcode,count(1) as personcount",
+    "@group": [
+        "deptcode"
+    ]
+}
+</code></pre>
+返回:
+<pre><code class="language-json">[
+    {
+        "DEPTCODE": "deptcode1",
+        "PERSONCOUNT": 2
     }
 ]
 </code></pre>

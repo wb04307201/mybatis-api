@@ -18,6 +18,7 @@ public class Builder {
         else sql.SELECT("*");
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
         findAny(params, Constant.PAGE).ifPresent(page -> parsePage(sql, page.getValue()));
+        findAny(params, Constant.GROUP).ifPresent(group -> parseGroup(sql, group.getValue()));
         return sql.toString();
     }
 
@@ -35,7 +36,6 @@ public class Builder {
             if (!k.startsWith(Constant.AT)) sql.SET(k + " = " + getValueStr(v));
         });
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
-        findAny(params, Constant.PAGE).ifPresent(page -> parsePage(sql, page.getValue()));
         return sql.toString();
     }
 
@@ -109,6 +109,11 @@ public class Builder {
             Integer pageIndex = p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (Integer) p.get(Constant.PAGE_INDEX) : 0;
             sql.OFFSET(pageSize * pageIndex).LIMIT(pageSize);
         }
+    }
+
+    private void parseGroup(SQL sql, Object group) {
+        List<String> p = (List<String>) group;
+        sql.GROUP_BY(p.toArray(new String[0]));
     }
 
     private Optional<Map.Entry<String, Object>> findAny(Map<String, Object> params, String key) {
