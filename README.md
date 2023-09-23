@@ -1,6 +1,7 @@
-# mybatis-api-spring-boot-starter mybatis通用接口启动器
+# mybatis-api-spring-boot-starter mybatis
+# MyBatis零代码接口
 
-基于mybatis,提供万能通用接口，零代码进行增删改查
+> 基于MyBatis，提供零代码接口接口，通过json进行对数据库的增删改查操作
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
 
