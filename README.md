@@ -47,7 +47,7 @@ public class MybatisApiDemoApplication {
 }
 ```
 
-## 第三步 编写代码调用bean
+## 第三步 编写代码调用RestController
 
 ```java
 @RestController
