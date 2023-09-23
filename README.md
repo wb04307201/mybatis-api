@@ -1,7 +1,7 @@
-# mybatis-api-spring-boot-starter mybatis
+# mybatis-api-spring-boot-starter
 # MyBatis零代码接口
 
-> 基于MyBatis，提供零代码接口接口，通过json进行对数据库的增删改查操作
+> 基于MyBatis，提供零代码接口，通过json进行对数据库的增删改查操作
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
 
