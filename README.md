@@ -32,7 +32,7 @@
     </dependency>
 ```
 
-## 第三步 在启动类上加上`@EnableFilePreview`注解
+## 第三步 在启动类上加上`@EnableMyBatisApi`注解
 
 ```java
 @EnableMyBatisApi
