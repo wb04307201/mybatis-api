@@ -11,6 +11,8 @@
 * [2.3 新增和修改](#2.3)
 * [2.4 查询](#2.4)
 * [2.5 删除](#2.5)
+* [2.6 join](#2.6)
+* [2.7 condition](#2.7)
 
 ## <h2 id="1">1.如何使用<h2/>
 ### 第一步 增加 JitPack 仓库
@@ -258,6 +260,8 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
+> @join支持join，inner_join，left_outer_join，right_outer_join，outer_join
+> @where condition支持eq,ueq,like,ulike,llike,rlike,gt,lt,gteq,lteq,between,notbetween,in,notin,null,notnull
 #### 请求体 分组查询:
 ```json
 {
@@ -303,3 +307,15 @@ public class MybatisApiDemoApplication {
 ```json
 2
 ```
+### <h3 id="2.6">2.6 join<h3/>
+
+|                  |   |
+|------------------|---|
+| join             |   |
+| inner_join       |   |
+| left_outer_join  |   |
+| right_outer_join |   |
+| outer_join       |   |
+
+
+### <h3 id="2.7">2.7 condition<h3/>
