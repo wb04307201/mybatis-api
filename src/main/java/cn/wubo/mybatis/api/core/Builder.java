@@ -118,7 +118,7 @@ public class Builder {
 
     private String getUpdateValueStr(Object valueObj) {
         String str = getValueStr(valueObj);
-        if ("'=null'".equals(valueObj)) return "null";
+        if ("'=null'".equals(str)) return "null";
         else return str;
     }
 
