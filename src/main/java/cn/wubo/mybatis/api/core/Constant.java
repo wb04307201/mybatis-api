@@ -10,5 +10,5 @@ public class Constant {
     public final static String AT = "@";
     public final static String PAGE_INDEX = "pageIndex";
     public final static String PAGE_SIZE = "pageSize";
-    public final static String ID = "id";
+    public final static String GROUP = "@group";
 }
