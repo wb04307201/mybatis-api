@@ -45,6 +45,7 @@ public class MybatisApiDemoApplication {
 ```
 
 ## <h2 id="2">2.语法 & 示例<h2/>
+[示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
 ### <h3 id="2.1">2.1 新增<h3/>
 > 新增时如果不传id值会按照uuid的方式填补  
 > 请求地址 http://ip:port/api/insert/person  
