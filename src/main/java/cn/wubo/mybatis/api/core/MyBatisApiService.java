@@ -1,5 +1,6 @@
 package cn.wubo.mybatis.api.core;
 
+import cn.wubo.mybatis.api.config.MyBatisApiProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,17 +13,23 @@ import java.util.stream.Collectors;
 
 public class MyBatisApiService {
 
+    MyBatisApiProperties myBatisApiProperties;
+
+    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties) {
+        this.myBatisApiProperties = myBatisApiProperties;
+    }
+
     @Resource
     MyBatisApiMapper mapper;
 
     @Transactional(rollbackFor = Exception.class)
-    public String parse(String method, String tableName, String context) {
+    public Object parse(String method, String tableName, String context) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            String res = "";
+            Object res = "";
             switch (method) {
                 case "select":
-                    res = objectMapper.writeValueAsString(mapper.select(tableName, objectMapper.readValue(context, Map.class)));
+                    res = mapper.select(tableName, objectMapper.readValue(context, Map.class));
                     break;
                 case "save":
                     res = saveParse(objectMapper, tableName, context);
@@ -40,30 +47,30 @@ public class MyBatisApiService {
         }
     }
 
-    public String deleteParse(ObjectMapper objectMapper, String tableName, String context) {
+    public Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
-                return objectMapper.writeValueAsString(objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().mapToInt(row -> mapper.delete(tableName, row)).sum());
+                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                }).stream().mapToInt(row -> mapper.delete(tableName, row)).sum();
             } else {
-                return objectMapper.writeValueAsString(mapper.delete(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                })));
+                return mapper.delete(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                }));
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e);
         }
     }
 
-    public String saveParse(ObjectMapper objectMapper, String tableName, String context) {
+    public Object saveParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
-                return objectMapper.writeValueAsString(objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().map(row -> saveOrUpdate(tableName, row)).collect(Collectors.toList()));
+                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                }).stream().map(row -> saveOrUpdate(tableName, row)).collect(Collectors.toList());
             } else {
-                return objectMapper.writeValueAsString(saveOrUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                })));
+                return saveOrUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                }));
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e);
@@ -72,21 +79,21 @@ public class MyBatisApiService {
 
     public Map<String, Object> saveOrUpdate(String tableName, Map<String, Object> params) {
         String id;
-        if (!params.containsKey(Constant.ID) || "".equals(params.get(Constant.ID))) {
+        if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId()))) {
             id = UUID.randomUUID().toString();
-            params.put(Constant.ID, id);
+            params.put(myBatisApiProperties.getId(), id);
             mapper.insert(tableName, params);
         } else {
-            id = String.valueOf(params.get(Constant.ID));
-            params.remove(Constant.ID);
+            id = String.valueOf(params.get(myBatisApiProperties.getId()));
+            params.remove(myBatisApiProperties.getId());
             Map<String, String> map = new HashMap<>();
-            map.put("key", Constant.ID);
+            map.put("key", myBatisApiProperties.getId());
             map.put("value", id);
             params.put(Constant.WHERE, Collections.singletonList(map));
             mapper.update(tableName, params);
         }
         Map<String, String> query = new HashMap<>();
-        query.put("key", Constant.ID);
+        query.put("key", myBatisApiProperties.getId());
         query.put("value", id);
         return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
     }

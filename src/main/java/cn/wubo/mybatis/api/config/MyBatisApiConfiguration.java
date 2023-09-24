@@ -26,7 +26,7 @@ public class MyBatisApiConfiguration {
 
     @Bean
     public MyBatisApiService myBatisApiService() {
-        return new MyBatisApiService();
+        return new MyBatisApiService(myBatisApiProperties);
     }
 
     @Bean

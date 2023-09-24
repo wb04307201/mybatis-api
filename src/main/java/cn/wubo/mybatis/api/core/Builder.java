@@ -30,7 +30,7 @@ public class Builder {
 
     public String update(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().UPDATE(tableName);
-        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(entry.getKey(), getUpdateValueStr(entry.getValue())));
+        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.SET(entry.getKey() + " = " + getUpdateValueStr(entry.getValue())));
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
         return sql.toString();
     }

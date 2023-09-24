@@ -7,4 +7,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "mybatis.api")
 public class MyBatisApiProperties {
     private String basePath = "api";
+    private String id = "id";
 }
