@@ -45,7 +45,6 @@ public class MyBatisApiService {
                     break;
                 default:
                     throw new MyBatisApiException("param method value not valid");
-
             }
             return res;
         } catch (JsonProcessingException e) {
