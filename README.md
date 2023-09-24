@@ -8,8 +8,9 @@
 * ### [2.语法 & 示例](#2)
 * [2.1 新增](#2.1)
 * [2.2 修改](#2.2)
-* [2.3 查询](#2.3)
-* [2.4 删除](#2.4)
+* [2.3 新增和修改](#2.3)
+* [2.4 查询](#2.4)
+* [2.5 删除](#2.5)
 
 ## <h2 id="1">1.如何使用<h2/>
 ### 第一步 增加 JitPack 仓库
@@ -147,7 +148,7 @@ public class MybatisApiDemoApplication {
   ]
 ]
 ```
-### <h3 id="2.3">2.3 保存和修改<h3/>
+### <h3 id="2.3">2.3 新增和修改<h3/>
 > 请求体包含id则根据id修改数据，不包含id则生成id新增数据    
 > 请求地址 http://ip:port/api/inertOrUpdate/person
 #### 请求体 单条数据
@@ -193,7 +194,7 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-### <h3 id="2.3">2.3 查询<h3/>
+### <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/person
 #### 请求体 单表查询:
 ```json
@@ -281,7 +282,7 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-### <h3 id="2.4">2.4 删除<h3/>
+### <h3 id="2.5">2.5 删除<h3/>
 > 请求地址 http://ip:port/api/delete/person
 #### 请求体:
 ```json
