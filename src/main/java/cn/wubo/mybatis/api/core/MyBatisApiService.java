@@ -37,6 +37,9 @@ public class MyBatisApiService {
                 case "update":
                     res = updateParse(objectMapper, tableName, context);
                     break;
+                case "insertOrUpdate":
+                    res = insertOrUpdateParse(objectMapper, tableName, context);
+                    break;
                 case "delete":
                     res = deleteParse(objectMapper, tableName, context);
                     break;
@@ -98,7 +101,7 @@ public class MyBatisApiService {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
                 return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().flatMap(row -> doUpdate(tableName, row).stream()).collect(Collectors.toList());
+                }).stream().map(row -> doUpdate(tableName, row)).collect(Collectors.toList());
             } else {
                 return doUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
                 }));
@@ -113,5 +116,41 @@ public class MyBatisApiService {
         Map<String, Object> query = new HashMap<>();
         query.put(Constant.WHERE, params.get(Constant.WHERE));
         return mapper.select(tableName, query);
+    }
+
+    public Object insertOrUpdateParse(ObjectMapper objectMapper, String tableName, String context) {
+        try {
+            JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
+            if (rootNode.isArray()) {
+                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                }).stream().map(row -> insertOrUpdate(tableName, row)).collect(Collectors.toList());
+            } else {
+                return insertOrUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                }));
+            }
+        } catch (JsonProcessingException e) {
+            throw new MyBatisApiException(e);
+        }
+    }
+
+    public Map<String, Object> insertOrUpdate(String tableName, Map<String, Object> params) {
+        String id;
+        if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId()))) {
+            id = UUID.randomUUID().toString();
+            params.put(myBatisApiProperties.getId(), id);
+            mapper.insert(tableName, params);
+        } else {
+            id = String.valueOf(params.get(myBatisApiProperties.getId()));
+            params.remove(myBatisApiProperties.getId());
+            Map<String, String> map = new HashMap<>();
+            map.put("key", myBatisApiProperties.getId());
+            map.put("value", id);
+            params.put(Constant.WHERE, Collections.singletonList(map));
+            mapper.update(tableName, params);
+        }
+        Map<String, String> query = new HashMap<>();
+        query.put("key", myBatisApiProperties.getId());
+        query.put("value", id);
+        return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
     }
 }
