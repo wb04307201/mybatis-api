@@ -35,8 +35,8 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MyBatisApiService myBatisApiService(List<IDService> idServices) {
-        IDService idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
+    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices) {
+        IDService<?> idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
         return new MyBatisApiService(myBatisApiProperties,idService);
     }
 

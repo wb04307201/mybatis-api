@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cn.wubo.mybatis.api.core.Constant.CONDITION;
+
 public class Builder {
 
     public String select(String tableName, Map<String, Object> params) {
@@ -58,7 +60,7 @@ public class Builder {
         conditions.forEach(condition -> {
             String keyStr = String.valueOf(condition.get("key"));
             Object valueObj = condition.get("value");
-            String conditionStr = condition.containsKey("condition") && !ObjectUtils.isEmpty(condition.get("condition")) ? String.valueOf(condition.get("condition")) : "eq";
+            String conditionStr = condition.containsKey(CONDITION) && !ObjectUtils.isEmpty(condition.get(CONDITION)) ? String.valueOf(condition.get(CONDITION)) : "eq";
 
             if (ObjectUtils.isEmpty(keyStr)) {
                 throw new MyBatisApiException("recieving incomplete @where key[" + keyStr + "]");

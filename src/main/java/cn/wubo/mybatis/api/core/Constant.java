@@ -2,13 +2,18 @@ package cn.wubo.mybatis.api.core;
 
 public class Constant {
 
-    public final static String WHERE = "@where";
-    public final static String COLUMN = "@column";
-    public final static String PAGE = "@page";
-    public final static String JOIN = "@join";
-    public final static String QUOTATION = "'";
-    public final static String AT = "@";
-    public final static String PAGE_INDEX = "pageIndex";
-    public final static String PAGE_SIZE = "pageSize";
-    public final static String GROUP = "@group";
+    private Constant() {
+    }
+
+    public static final String WHERE = "@where";
+    public static final String COLUMN = "@column";
+    public static final String PAGE = "@page";
+    public static final String JOIN = "@join";
+    public static final String QUOTATION = "'";
+    public static final String AT = "@";
+    public static final String PAGE_INDEX = "pageIndex";
+    public static final String PAGE_SIZE = "pageSize";
+    public static final String GROUP = "@group";
+    public static final String CONDITION = "condition";
+    public static final String VALUE = "value";
 }

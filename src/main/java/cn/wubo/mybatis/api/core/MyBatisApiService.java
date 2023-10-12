@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static cn.wubo.mybatis.api.core.Constant.VALUE;
+
 public class MyBatisApiService {
 
     private final MyBatisApiProperties myBatisApiProperties;
@@ -150,13 +152,13 @@ public class MyBatisApiService {
             params.remove(myBatisApiProperties.getId());
             Map<String, Object> map = new HashMap<>();
             map.put("key", myBatisApiProperties.getId());
-            map.put("value", id);
+            map.put(VALUE, id);
             params.put(Constant.WHERE, Collections.singletonList(map));
             mapper.update(tableName, params);
         }
         Map<String, Object> query = new HashMap<>();
         query.put("key", myBatisApiProperties.getId());
-        query.put("value", id);
+        query.put(VALUE, id);
         return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
     }
 }
