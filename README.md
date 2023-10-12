@@ -110,7 +110,7 @@ mybatis:
   api:
     idClass: cn.wubo.mybatis.api.demo.SnowflakeIdServiceImpl #主键生成方法
 ```
-继承IDService接口并实现
+继承IDService接口后实现generalID方法，并注册bean
 ```java
 @Component
 public class SnowflakeIdServiceImpl implements IDService<Long> {
