@@ -1,6 +1,7 @@
 package cn.wubo.mybatis.api.core;
 
 import cn.wubo.mybatis.api.config.MyBatisApiProperties;
+import cn.wubo.mybatis.api.core.id.IDService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,15 +9,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MyBatisApiService {
 
-    MyBatisApiProperties myBatisApiProperties;
+    private final MyBatisApiProperties myBatisApiProperties;
 
-    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties) {
+    private final IDService<?> idService;
+
+    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties, IDService<?> idService) {
         this.myBatisApiProperties = myBatisApiProperties;
+        this.idService = idService;
     }
 
     @Resource
@@ -83,13 +90,13 @@ public class MyBatisApiService {
     }
 
     private Map<String, Object> doInsert(String tableName, Map<String, Object> params) {
-        String id;
+        Object id;
         if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId())))
-            id = UUID.randomUUID().toString();
+            id = idService.generalID();
         else id = String.valueOf(params.get(myBatisApiProperties.getId()));
         params.put(myBatisApiProperties.getId(), id);
         mapper.insert(tableName, params);
-        Map<String, String> query = new HashMap<>();
+        Map<String, Object> query = new HashMap<>();
         query.put("key", myBatisApiProperties.getId());
         query.put("value", id);
         return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
@@ -133,21 +140,21 @@ public class MyBatisApiService {
     }
 
     public Map<String, Object> insertOrUpdate(String tableName, Map<String, Object> params) {
-        String id;
+        Object id;
         if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId()))) {
-            id = UUID.randomUUID().toString();
+            id = idService.generalID();
             params.put(myBatisApiProperties.getId(), id);
             mapper.insert(tableName, params);
         } else {
             id = String.valueOf(params.get(myBatisApiProperties.getId()));
             params.remove(myBatisApiProperties.getId());
-            Map<String, String> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
             map.put("key", myBatisApiProperties.getId());
             map.put("value", id);
             params.put(Constant.WHERE, Collections.singletonList(map));
             mapper.update(tableName, params);
         }
-        Map<String, String> query = new HashMap<>();
+        Map<String, Object> query = new HashMap<>();
         query.put("key", myBatisApiProperties.getId());
         query.put("value", id);
         return mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query))).get(0);
