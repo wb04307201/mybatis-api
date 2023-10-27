@@ -4,6 +4,8 @@ import cn.wubo.mybatis.api.core.MyBatisApiException;
 import cn.wubo.mybatis.api.core.MyBatisApiService;
 import cn.wubo.mybatis.api.core.id.IDService;
 import cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl;
+import cn.wubo.mybatis.api.core.mapping.IMappingService;
+import cn.wubo.mybatis.api.core.mapping.impl.LowerCaseMappingServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,9 +37,15 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices) {
+    public IMappingService lowerCaseMappingServiceImpl() {
+        return new LowerCaseMappingServiceImpl();
+    }
+
+    @Bean
+    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices) {
         IDService<?> idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
-        return new MyBatisApiService(myBatisApiProperties,idService);
+        IMappingService mappingService = mappingServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getMappingClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IMappingService！", myBatisApiProperties.getMappingClass())));
+        return new MyBatisApiService(myBatisApiProperties, idService, mappingService);
     }
 
     @Bean

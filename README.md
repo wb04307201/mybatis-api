@@ -12,6 +12,7 @@
 * #### [2.2 修改](#2.2)
 * #### [2.3 新增和修改](#2.3)
 * #### [2.4 查询](#2.4)
+* ###### [2.4.1 自定义结果集映射](#2.4.1)
 * #### [2.5 删除](#2.5)
 * #### [2.6 请求基础地质](#2.6)
 
@@ -32,7 +33,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </dependency>
 ```
 
@@ -64,9 +65,9 @@ public class MybatisApiDemoApplication {
 #### 响应:
 ```json
 {
-  "CODE": "22222",
-  "ID": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-  "NAME": "22222"
+  "code": "22222",
+  "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
+  "name": "22222"
 }
 ```
 #### 请求体 批量数据
@@ -86,14 +87,14 @@ public class MybatisApiDemoApplication {
 ```json
 [
   {
-    "CODE": "11111",
-    "ID": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "NAME": "11111"
+    "code": "11111",
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "11111"
   },
   {
-    "CODE": "22222",
-    "ID": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-    "NAME": "22222"
+    "code": "22222",
+    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
+    "name": "22222"
   }
 ]
 ```
@@ -295,9 +296,9 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```json
 [
   {
-    "CODE": "33333",
-    "ID": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "NAME": "33333"
+    "code": "33333",
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "33333"
   }
 ]
 ```
@@ -322,9 +323,9 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 [
   [
     {
-      "CODE": "33333",
-      "ID": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-      "NAME": "33333"
+      "code": "33333",
+      "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+      "name": "33333"
     }
   ]
 ]
@@ -342,9 +343,9 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 #### 响应:
 ```json
 {
-  "CODE": "22222",
-  "ID": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-  "NAME": "22222"
+  "code": "22222",
+  "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
+  "name": "22222"
 }
 ```
 #### 请求体 批量数据
@@ -364,14 +365,14 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```json
 [
   {
-    "CODE": "11111",
-    "ID": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "NAME": "11111"
+    "code": "11111",
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "11111"
   },
   {
-    "CODE": "22222",
-    "ID": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-    "NAME": "33333"
+    "code": "22222",
+    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
+    "name": "33333"
   }
 ]
 ```
@@ -386,6 +387,34 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
       "key": "id",
       "condition": "notnull"
     }
+  ]
+}
+```
+#### 响应:
+```json
+[
+  {
+    "id": "001",
+    "name": "name1"
+  },
+  {
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "33333"
+  },
+  {
+    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
+    "name": "22222"
+  }
+]
+```
+#### 请求体 分页查询:
+```json
+{
+  "@where": [
+    {
+      "key": "id",
+      "condition": "notnull"
+    }
   ],
   "@page": {
     "pageIndex": 0,
@@ -395,20 +424,37 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```
 #### 响应:
 ```json
-[
-  {
-    "ID": "001",
-    "NAME": "name1"
-  },
-  {
-    "ID": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "NAME": "33333"
-  },
-  {
-    "ID": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-    "NAME": "22222"
-  }
-]
+{
+  "total": 4,
+  "pageSize": 10,
+  "pageIndex": 0,
+  "records": [
+    {
+      "code": "22",
+      "name": "22",
+      "person_memo": "1",
+      "id": 872320795374780416
+    },
+    {
+      "code": "11111",
+      "name": "11111",
+      "person_memo": "2",
+      "id": 872320851729448960
+    },
+    {
+      "code": "11111",
+      "name": "11111",
+      "person_memo": "3",
+      "id": 872320854896148480
+    },
+    {
+      "code": "11111",
+      "name": "11111",
+      "person_memo": "4",
+      "id": 872320858343866368
+    }
+  ]
+}
 ```
 #### 请求体 多表关联查询:
 ```json
@@ -420,10 +466,6 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
       "condition": "notnull"
     }
   ],
-  "@page": {
-    "pageIndex": 0,
-    "pageSize": 10
-  },
   "@join": {
     "join": "dept on person.deptcode = dept.code"
   }
@@ -433,9 +475,9 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```json
 [
   {
-    "DEPTCODE": "deptcode1",
-    "ID": "001",
-    "NAME": "name1"
+    "deptcode": "deptcode1",
+    "id": "001",
+    "name": "name1"
   }
 ]
 ```
@@ -460,11 +502,30 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```json
 [
   {
-    "DEPTCODE": "deptcode1",
-    "PERSONCOUNT": "2"
+    "deptcode": "deptcode1",
+    "personcount": "2"
   }
 ]
 ```
+###### <h4 id="2.4.1">2.4.1 自定义结果集映射<h3/>
+默认可将结果集key值转成小写，也可通过配置和编码重写
+```yaml
+mybatis:
+  api:
+    mappingClass: cn.wubo.mybatis.api.demo.CamelCaseMappingServiceImpl #自定义结果集映射,驼峰方式
+```
+集成IMappingService接口并实现parseKey方法
+```java
+@Component
+public class CamelCaseMappingServiceImpl implements IMappingService {
+    @Override
+    public String parseKey(String field) {
+        String[] words = field.split("[-_]");
+        return Arrays.stream(words, 1, words.length).map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase()).reduce(words[0].toLowerCase(), String::concat);
+    }
+}
+```
+
 ## <h3 id="2.5">2.5 删除<h3/>
 > 请求地址 http://ip:port/api/delete/{tableName}
 #### 请求体:

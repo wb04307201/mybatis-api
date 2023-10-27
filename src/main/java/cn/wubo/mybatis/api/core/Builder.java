@@ -102,11 +102,9 @@ public class Builder {
 
     private void parsePage(SQL sql, Object page) {
         Map<String, Object> p = (Map<String, Object>) page;
-        if (p.containsKey(Constant.PAGE_SIZE) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_SIZE))) {
-            Integer pageSize = (Integer) p.get(Constant.PAGE_SIZE);
-            Integer pageIndex = p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (Integer) p.get(Constant.PAGE_INDEX) : 0;
-            sql.OFFSET((long) pageSize * pageIndex).LIMIT(pageSize);
-        }
+        int pageSize = p.containsKey(Constant.PAGE_SIZE) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_SIZE)) ? (int) p.get(Constant.PAGE_SIZE) : 10;
+        int pageIndex = p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (int) p.get(Constant.PAGE_INDEX) : 0;
+        sql.OFFSET((long) pageSize * pageIndex).LIMIT(pageSize);
     }
 
     private void parseGroup(SQL sql, Object group) {
