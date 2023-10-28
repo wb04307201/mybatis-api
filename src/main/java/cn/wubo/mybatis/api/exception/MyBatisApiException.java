@@ -1,4 +1,4 @@
-package cn.wubo.mybatis.api.core;
+package cn.wubo.mybatis.api.exception;
 
 public class MyBatisApiException extends RuntimeException {
     public MyBatisApiException(String message) {

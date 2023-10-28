@@ -1,5 +1,7 @@
 package cn.wubo.mybatis.api.core;
 
+import cn.wubo.mybatis.api.exception.MyBatisApiException;
+import cn.wubo.mybatis.api.util.SqlInjectionUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.springframework.util.ObjectUtils;
 
@@ -135,7 +137,9 @@ public class Builder {
     }
 
     private String getValueStr(Object valueObj) {
-        return valueObj instanceof String ? Constant.QUOTATION + valueObj + Constant.QUOTATION : String.valueOf(valueObj);
+        String valueStr = valueObj instanceof String ? Constant.QUOTATION + valueObj + Constant.QUOTATION : String.valueOf(valueObj);
+        if (SqlInjectionUtils.check(valueStr)) throw new MyBatisApiException("参数存在 SQL 注入!");
+        return valueStr;
     }
 
     private String concatUpperStr(String keyStr) {

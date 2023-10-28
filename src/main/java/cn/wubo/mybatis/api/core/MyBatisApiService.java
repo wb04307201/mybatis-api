@@ -3,6 +3,7 @@ package cn.wubo.mybatis.api.core;
 import cn.wubo.mybatis.api.config.MyBatisApiProperties;
 import cn.wubo.mybatis.api.core.id.IDService;
 import cn.wubo.mybatis.api.core.mapping.IMappingService;
+import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

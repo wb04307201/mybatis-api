@@ -1,6 +1,6 @@
 package cn.wubo.mybatis.api.config;
 
-import cn.wubo.mybatis.api.core.MyBatisApiException;
+import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import cn.wubo.mybatis.api.core.MyBatisApiService;
 import cn.wubo.mybatis.api.core.id.IDService;
 import cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl;
