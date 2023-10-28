@@ -50,7 +50,10 @@ public class MyBatisApiConfiguration {
 
     @Bean
     public RouterFunction<ServerResponse> myBatisApiRouter(MyBatisApiService myBatisApiService) {
-        return route().POST("/" + myBatisApiProperties.getBasePath() + "/{method}/{tableName}", accept(MediaType.APPLICATION_JSON), request -> {
+        if(!myBatisApiProperties.getBasePath().startsWith("/") || myBatisApiProperties.getBasePath().endsWith("/"))
+            throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
+
+        return route().POST(myBatisApiProperties.getBasePath() + "/{method}/{tableName}", accept(MediaType.APPLICATION_JSON), request -> {
             String method = request.pathVariable("method");
             String tableName = request.pathVariable("tableName");
             return ServerResponse.status(HttpStatus.OK).body(myBatisApiService.parse(method, tableName, request.body(String.class)));

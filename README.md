@@ -551,5 +551,5 @@ public class CamelCaseMappingServiceImpl implements IMappingService {
 ```yaml
 mybatis:
   api:
-    basePath: api #访问接口基础路径
+    basePath: /api #访问接口基础路径
 ```
