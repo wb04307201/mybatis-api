@@ -6,6 +6,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static cn.wubo.mybatis.api.core.Constant.CONDITION;
@@ -16,11 +17,17 @@ public class Builder {
         SQL sql = new SQL().FROM(tableName);
         findAny(params, Constant.JOIN).ifPresent(join -> parseJoin(sql, join.getValue()));
         Optional<Map.Entry<String, Object>> select = findAny(params, Constant.COLUMN);
-        if (select.isPresent()) sql.SELECT(String.valueOf(select.get().getValue()).split(","));
+        AtomicReference<Boolean> distinct = new AtomicReference<>();
+        findAny(params, Constant.DISTINCT).ifPresent(dis -> distinct.set(dis.getValue() != null && Boolean.TRUE.equals(dis.getValue())));
+        if (select.isPresent() && Boolean.TRUE.equals(distinct.get()))
+            sql.SELECT_DISTINCT(String.valueOf(select.get().getValue()).split(","));
+        else if (select.isPresent()) sql.SELECT(String.valueOf(select.get().getValue()).split(","));
+        else if (Boolean.TRUE.equals(distinct.get())) sql.SELECT_DISTINCT("*");
         else sql.SELECT("*");
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
         findAny(params, Constant.PAGE).ifPresent(page -> parsePage(sql, page.getValue()));
         findAny(params, Constant.GROUP).ifPresent(group -> parseGroup(sql, group.getValue()));
+        findAny(params, Constant.ORDER).ifPresent(group -> parseOrder(sql, group.getValue()));
         return sql.toString();
     }
 
@@ -110,6 +117,11 @@ public class Builder {
     private void parseGroup(SQL sql, Object group) {
         List<String> p = (List<String>) group;
         sql.GROUP_BY(p.toArray(new String[0]));
+    }
+
+    private void parseOrder(SQL sql, Object order) {
+        List<String> p = (List<String>) order;
+        sql.ORDER_BY(p.toArray(new String[0]));
     }
 
     private Optional<Map.Entry<String, Object>> findAny(Map<String, Object> params, String key) {
