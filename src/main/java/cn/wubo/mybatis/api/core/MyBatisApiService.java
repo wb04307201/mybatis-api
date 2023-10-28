@@ -46,7 +46,7 @@ public class MyBatisApiService {
             case "delete":
                 return deleteParse(objectMapper, tableName, context);
             default:
-                throw new MyBatisApiException("param method value not valid");
+                throw new MyBatisApiException(String.format("method [%s] value not valid", method));
         }
     }
 
