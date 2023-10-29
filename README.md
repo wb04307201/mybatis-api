@@ -12,7 +12,12 @@
 * ###### [2.3.1 自定义主键名称](#2.3.1)
 * ###### [2.3.2 自定义生成主键值](#2.3.2)
 * #### [2.4 查询](#2.4)
-* ###### [2.4.1 自定义结果集映射](#2.4.1)
+* ###### [2.4.1 单表查询](#2.4.1)
+* ###### [2.4.2 分页查询](#2.4.2)
+* ###### [2.4.3 多表关联查询](#2.4.3)
+* ###### [2.4.4 分组查询](#2.4.4)
+* ###### [2.4.5 去重和排序](#2.4.5)
+* ###### [2.4.6 自定义结果集映射](#2.4.6)
 * #### [2.5 删除](#2.5)
 * #### [2.6 groovy](#2.6)
 * #### [2.7 请求基础路径](#2.7)
@@ -364,7 +369,8 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```
 ## <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/{tableName}
-#### 请求体 单表查询:
+###### <h4 id="2.4.1">2.4.1 单表查询<h3/>
+#### 请求体:
 ```json
 {
   "@column": "id,name",
@@ -393,7 +399,8 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
   }
 ]
 ```
-#### 请求体 分页查询:
+###### <h4 id="2.4.2">2.4.2 分页查询<h3/>
+#### 请求体:
 ```json
 {
   "@where": [
@@ -442,7 +449,8 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
   ]
 }
 ```
-#### 请求体 多表关联查询:
+###### <h4 id="2.4.3">2.4.3 多表关联查询<h3/>
+#### 请求体:
 ```json
 {
   "@column": "person.id,person.name,person.deptcode,dept.name",
@@ -469,7 +477,8 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 ```
 > @join支持join，inner_join，left_outer_join，right_outer_join，outer_join
 > @where condition支持eq,ueq,like,ulike,llike,rlike,gt,lt,gteq,lteq,between,notbetween,in,notin,null,notnull
-#### 请求体 分组查询:
+###### <h4 id="2.4.4">2.4.4 分组查询<h3/>
+#### 请求体:
 ```json
 {
   "@column": "deptcode,count(1) as personcount",
@@ -493,7 +502,25 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
   }
 ]
 ```
-###### <h4 id="2.4.1">2.4.1 自定义结果集映射<h3/>
+###### <h4 id="2.4.5">2.4.5 去重和排序<h3/>
+```http request
+POST http://localhost:8080/api/select/sys_user
+Content-Type: application/json
+
+{
+  "@column": "name,code",
+  "@where":[
+    {
+      "key": "id",
+      "condition": "notnull"
+    }
+  ],
+  "@distinct": true,
+  "@order":["code desc"]
+}
+```
+
+###### <h4 id="2.4.6">2.4.6 自定义结果集映射<h3/>
 默认可将结果集key值转成小写，也可通过配置和编码重写
 ```yaml
 mybatis:
