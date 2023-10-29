@@ -194,15 +194,10 @@ public class MybatisApiDemoApplication {
 ```yaml
 mybatis:
   api:
-    id: id #数据库主键名称
+    id: id id #数据库主键名称，默认为id
 ```
 
 ###### <h4 id="2.3.2">2.3.2 自定义生成主键值<h3/>
-```yaml
-mybatis:
-  api:
-    idClass: cn.wubo.mybatis.api.demo.SnowflakeIdServiceImpl #主键生成方法
-```
 继承IDService接口后实现generalID方法，并注册bean
 ```java
 @Component
@@ -367,6 +362,12 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
     }
 }
 ```
+修改配置
+```yaml
+mybatis:
+  api:
+    idClass: cn.wubo.mybatis.api.demo.SnowflakeIdServiceImpl #主键生成方法,默认使用uuid，示例为雪花算法
+```
 ## <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/{tableName}
 ###### <h4 id="2.4.1">2.4.1 单表查询<h3/>
@@ -521,12 +522,6 @@ Content-Type: application/json
 ```
 
 ###### <h4 id="2.4.6">2.4.6 自定义结果集映射<h3/>
-默认可将结果集key值转成小写，也可通过配置和编码重写
-```yaml
-mybatis:
-  api:
-    mappingClass: cn.wubo.mybatis.api.demo.CamelCaseMappingServiceImpl #自定义结果集映射,驼峰方式
-```
 集成IMappingService接口并实现parseKey方法
 ```java
 @Component
@@ -537,6 +532,12 @@ public class CamelCaseMappingServiceImpl implements IMappingService {
         return Arrays.stream(words, 1, words.length).map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase()).reduce(words[0].toLowerCase(), String::concat);
     }
 }
+```
+修改配置
+```yaml
+mybatis:
+  api:
+    mappingClass: cn.wubo.mybatis.api.demo.CamelCaseMappingServiceImpl #自定义结果集映射,默认转小写，示例为驼峰方式
 ```
 
 ## <h3 id="2.5">2.5 删除<h3/>
@@ -581,12 +582,19 @@ mybatis:
     basePath: /api #访问接口基础路径,默认为/api
 ```
 ## <h3 id="2.8">2.8 自定义统一响应<h3/>
+继承IResultService接口后实现generalResult方法，并注册bean
+```java
+@Component
+public class ResponseResultServiceImpl implements IResultService<ResponseEntity<?>> {
+    @Override
+    public ResponseEntity<?> generalResult(Object o) {
+        return ResponseEntity.ok(o);
+    }
+}
+```
+添加配置
 ```yaml
 mybatis:
   api:
-    resultClass: cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl #自定义统一响应转换,默认不进行转换
-```
-继承IResultService接口后实现generalResult方法，并注册bean
-```java
-
+    resultClass: cn.wubo.mybatis.api.demo.ResponseResultServiceImpl #自定义统一响应转换,,默认不进行转换,示例为ResponseEntity
 ```
