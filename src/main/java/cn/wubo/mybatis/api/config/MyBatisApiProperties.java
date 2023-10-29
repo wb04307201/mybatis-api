@@ -10,4 +10,5 @@ public class MyBatisApiProperties {
     private String id = "id";
     private String idClass = "cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl";
     private String mappingClass = "cn.wubo.mybatis.api.core.mapping.impl.LowerCaseMappingServiceImpl";
+    private String resultClass = "cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl";
 }

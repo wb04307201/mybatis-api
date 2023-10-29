@@ -1,5 +1,7 @@
 package cn.wubo.mybatis.api.config;
 
+import cn.wubo.mybatis.api.core.result.IResultService;
+import cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl;
 import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import cn.wubo.mybatis.api.core.MyBatisApiService;
 import cn.wubo.mybatis.api.core.id.IDService;
@@ -32,7 +34,7 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public UUIDServiceImpl uuidService() {
+    public IDService<?> uuidService() {
         return new UUIDServiceImpl();
     }
 
@@ -42,10 +44,16 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices) {
+    public IResultService<?> noneResultServiceImpl() {
+        return new NoneResultServiceImpl();
+    }
+
+    @Bean
+    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices,List<IResultService<?>> iResultServices) {
         IDService<?> idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
         IMappingService mappingService = mappingServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getMappingClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IMappingService！", myBatisApiProperties.getMappingClass())));
-        return new MyBatisApiService(myBatisApiProperties, idService, mappingService);
+        IResultService<?> resultService = iResultServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getResultClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IResultService！", myBatisApiProperties.getResultClass())));
+        return new MyBatisApiService(myBatisApiProperties, idService, mappingService,resultService);
     }
 
     @Bean

@@ -2,6 +2,7 @@ package cn.wubo.mybatis.api.core;
 
 import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import cn.wubo.mybatis.api.util.SqlInjectionUtils;
+import groovy.lang.GroovyShell;
 import org.apache.ibatis.jdbc.SQL;
 import org.springframework.util.ObjectUtils;
 
@@ -35,13 +36,13 @@ public class Builder {
 
     public String insert(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().INSERT_INTO(tableName);
-        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(entry.getKey(), getValueStr(entry.getValue())));
+        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(getKeyStr(entry.getKey()), getValueStr(entry.getKey(), entry.getValue())));
         return sql.toString();
     }
 
     public String update(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().UPDATE(tableName);
-        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.SET(entry.getKey() + " = " + getUpdateValueStr(entry.getValue())));
+        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.SET(getKeyStr(entry.getKey()) + " = " + getValueStr(entry.getKey(), entry.getValue(), Boolean.TRUE, Boolean.FALSE)));
         findAny(params, Constant.WHERE).ifPresent(where -> parseWhere(sql, where.getValue()));
         return sql.toString();
     }
@@ -76,19 +77,19 @@ public class Builder {
             }
 
             if (conditionStr.equalsIgnoreCase(MatchParams.EQ.name()) || conditionStr.equalsIgnoreCase(MatchParams.UEQ.name())) {
-                sql.WHERE(keyStr + MatchParams.search(conditionStr.toUpperCase()).value() + getValueStr(valueObj));
+                sql.WHERE(getKeyStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value() + getValueStr(keyStr, valueObj));
             } else if (conditionStr.equalsIgnoreCase(MatchParams.LIKE.name()) || conditionStr.equalsIgnoreCase(MatchParams.ULIKE.name())) {
-                sql.WHERE(concatUpperStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value() + "'%" + String.valueOf(valueObj).toUpperCase() + "%'");
+                sql.WHERE(upperValueStr(getKeyStr(keyStr)) + MatchParams.search(conditionStr.toUpperCase()).value() + "'%" + getValueStr(keyStr, valueObj, Boolean.FALSE, Boolean.TRUE) + "%'");
             } else if (conditionStr.equalsIgnoreCase(MatchParams.LLIKE.name())) {
-                sql.WHERE(concatUpperStr(keyStr) + MatchParams.LLIKE.value() + "'%" + String.valueOf(valueObj).toUpperCase() + "'");
+                sql.WHERE(upperValueStr(getKeyStr(keyStr)) + MatchParams.LLIKE.value() + "'%" + getValueStr(keyStr, valueObj, Boolean.FALSE, Boolean.TRUE) + "'");
             } else if (conditionStr.equalsIgnoreCase(MatchParams.RLIKE.name())) {
-                sql.WHERE(concatUpperStr(keyStr) + MatchParams.RLIKE.value() + "'" + String.valueOf(valueObj).toUpperCase() + "%'");
+                sql.WHERE(upperValueStr(getKeyStr(keyStr)) + MatchParams.RLIKE.value() + "'" + getValueStr(keyStr, valueObj, Boolean.FALSE, Boolean.TRUE) + "%'");
             } else if (conditionStr.equalsIgnoreCase(MatchParams.GT.name()) || conditionStr.equalsIgnoreCase(MatchParams.LT.name()) || conditionStr.equalsIgnoreCase(MatchParams.GTEQ.name()) || conditionStr.equalsIgnoreCase(MatchParams.LTEQ.name())) {
-                sql.WHERE(keyStr + MatchParams.search(conditionStr.toUpperCase()).value() + getValueStr(valueObj));
+                sql.WHERE(getKeyStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value() + getValueStr(keyStr, valueObj));
             } else if (conditionStr.equalsIgnoreCase(MatchParams.BETWEEN.name()) || conditionStr.equalsIgnoreCase(MatchParams.NOTBETWEEN.name())) {
                 if (valueObj instanceof List && ((List<Object>) valueObj).size() == 2) {
                     List<Object> valueObjs = (List<Object>) valueObj;
-                    sql.WHERE(keyStr + MatchParams.search(conditionStr.toUpperCase()).value() + "(" + getValueStr(valueObjs.get(0)) + "," + getValueStr(valueObjs.get(1)) + ")");
+                    sql.WHERE(getKeyStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value() + "(" + getValueStr(keyStr, valueObjs.get(0)) + "," + getValueStr(keyStr, valueObjs.get(1)) + ")");
                 } else {
                     throw new MyBatisApiException("recieving incomplete @where condition between values invalid");
                 }
@@ -98,13 +99,13 @@ public class Builder {
                     if (valueObjs.isEmpty()) {
                         sql.WHERE("1 = 2");
                     } else {
-                        sql.WHERE(keyStr + MatchParams.search(conditionStr.toUpperCase()).value() + "(" + valueObjs.stream().map(this::getValueStr).collect(Collectors.joining(",")) + ")");
+                        sql.WHERE(getKeyStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value() + "(" + valueObjs.stream().map(vo -> getValueStr(keyStr, vo)).collect(Collectors.joining(",")) + ")");
                     }
                 } else {
                     throw new MyBatisApiException("recieving incomplete @where condition in values invalid");
                 }
             } else if (conditionStr.equalsIgnoreCase(MatchParams.NULL.name()) || conditionStr.equalsIgnoreCase(MatchParams.NOTNULL.name())) {
-                sql.WHERE(keyStr + MatchParams.search(conditionStr.toUpperCase()).value());
+                sql.WHERE(getKeyStr(keyStr) + MatchParams.search(conditionStr.toUpperCase()).value());
             }
         });
     }
@@ -130,19 +131,32 @@ public class Builder {
         return params.entrySet().stream().filter(entry -> entry.getKey().equals(key)).findAny();
     }
 
-    private String getUpdateValueStr(Object valueObj) {
-        String str = getValueStr(valueObj);
-        if ("'=null'".equals(str)) return "null";
-        else return str;
+    private String getValueStr(String key, Object valueObj) {
+        return getValueStr(key, valueObj, Boolean.FALSE, Boolean.FALSE);
     }
 
-    private String getValueStr(Object valueObj) {
-        String valueStr = valueObj instanceof String ? Constant.QUOTATION + valueObj + Constant.QUOTATION : String.valueOf(valueObj);
-        if (SqlInjectionUtils.check(valueStr)) throw new MyBatisApiException("参数存在 SQL 注入!");
+    private String getValueStr(String key, Object valueObj, Boolean isUpdate, Boolean isLike) {
+        Object result = valueObj;
+        if (key.endsWith("(G)")) {
+            GroovyShell gs = new GroovyShell();
+            result = gs.evaluate(String.valueOf(valueObj));
+        }
+        String valueStr;
+        if (Boolean.TRUE.equals(isLike)) valueStr = String.valueOf(result).toUpperCase();
+        else if (result instanceof String && SqlInjectionUtils.check((String) result))
+            throw new MyBatisApiException("参数是否存在 SQL 注入!");
+        else if (result instanceof String) valueStr = Constant.QUOTATION + result + Constant.QUOTATION;
+        else valueStr = String.valueOf(result);
+
+        if (Boolean.TRUE.equals(isUpdate) && "'=null'".equals(valueStr)) valueStr = "null";
         return valueStr;
     }
 
-    private String concatUpperStr(String keyStr) {
+    private String getKeyStr(String key) {
+        return key.replace("(G)", "");
+    }
+
+    private String upperValueStr(String keyStr) {
         return "upper(" + keyStr + ")";
     }
 }

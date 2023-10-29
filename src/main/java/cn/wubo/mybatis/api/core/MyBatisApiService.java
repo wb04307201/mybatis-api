@@ -3,6 +3,7 @@ package cn.wubo.mybatis.api.core;
 import cn.wubo.mybatis.api.config.MyBatisApiProperties;
 import cn.wubo.mybatis.api.core.id.IDService;
 import cn.wubo.mybatis.api.core.mapping.IMappingService;
+import cn.wubo.mybatis.api.core.result.IResultService;
 import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -22,11 +23,13 @@ public class MyBatisApiService {
     private final MyBatisApiProperties myBatisApiProperties;
     private final IDService<?> idService;
     private final IMappingService mappingService;
+    private final IResultService<?> resultService;
 
-    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties, IDService<?> idService, IMappingService mappingService) {
+    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties, IDService<?> idService, IMappingService mappingService, IResultService<?> resultService) {
         this.myBatisApiProperties = myBatisApiProperties;
         this.idService = idService;
         this.mappingService = mappingService;
+        this.resultService = resultService;
     }
 
     @Resource
@@ -35,20 +38,27 @@ public class MyBatisApiService {
     @Transactional(rollbackFor = Exception.class)
     public Object parse(String method, String tableName, String context) {
         ObjectMapper objectMapper = new ObjectMapper();
+        Object r;
         switch (method) {
             case "select":
-                return selectParse(objectMapper, tableName, context);
+                r = selectParse(objectMapper, tableName, context);
+                break;
             case "insert":
-                return insertParse(objectMapper, tableName, context);
+                r = insertParse(objectMapper, tableName, context);
+                break;
             case "update":
-                return updateParse(objectMapper, tableName, context);
+                r = updateParse(objectMapper, tableName, context);
+                break;
             case "insertOrUpdate":
-                return insertOrUpdateParse(objectMapper, tableName, context);
+                r = insertOrUpdateParse(objectMapper, tableName, context);
+                break;
             case "delete":
-                return deleteParse(objectMapper, tableName, context);
+                r = deleteParse(objectMapper, tableName, context);
+                break;
             default:
                 throw new MyBatisApiException(String.format("method [%s] value not valid", method));
         }
+        return resultService.generalResult(r);
     }
 
     private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
@@ -88,7 +98,7 @@ public class MyBatisApiService {
         }
     }
 
-    private Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
+    private Integer deleteParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
@@ -103,28 +113,19 @@ public class MyBatisApiService {
         }
     }
 
-    private Object insertParse(ObjectMapper objectMapper, String tableName, String context) {
+    private Integer insertParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
                 return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().map(row -> doInsert(tableName, row)).collect(Collectors.toList());
+                }).stream().mapToInt(row -> mapper.insert(tableName, row)).sum();
             } else {
-                return doInsert(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                return mapper.insert(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
                 }));
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e.getMessage(), e);
         }
-    }
-
-    private List<Map<String, Object>> doInsert(String tableName, Map<String, Object> params) {
-        Object id;
-        if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId())))
-            id = idService.generalID();
-        else id = String.valueOf(params.get(myBatisApiProperties.getId()));
-        params.put(myBatisApiProperties.getId(), id);
-        return mapParse(mapper.select(tableName, params));
     }
 
     private Object updateParse(ObjectMapper objectMapper, String tableName, String context) {

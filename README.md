@@ -7,14 +7,16 @@
 * ## [1.如何使用](#1)
 * ## [2.语法 & 示例](#2)
 * #### [2.1 新增](#2.1)
-* ###### [2.1.1 自定义主键名称](#2.1.1)
-* ###### [2.1.2 自定义生成主键值](#2.1.2)
 * #### [2.2 修改](#2.2)
-* #### [2.3 新增和修改](#2.3)
+* #### [2.3 新增或修改](#2.3)
+* ###### [2.3.1 自定义主键名称](#2.3.1)
+* ###### [2.3.2 自定义生成主键值](#2.3.2)
 * #### [2.4 查询](#2.4)
 * ###### [2.4.1 自定义结果集映射](#2.4.1)
 * #### [2.5 删除](#2.5)
-* #### [2.6 请求基础路径](#2.6)
+* #### [2.6 groovy](#2.6)
+* #### [2.7 请求基础路径](#2.7)
+* #### [2.8 自定义统一响应](#2.8)
 
 
 ## <h2 id="1">1.如何使用<h2/>
@@ -33,7 +35,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
     </dependency>
 ```
 
@@ -53,8 +55,93 @@ public class MybatisApiDemoApplication {
 ## <h2 id="2">2.语法 & 示例<h2/>
 [示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
 #### <h3 id="2.1">2.1 新增<h3/>
-> 新增时如果不传id值会按照uuid的方式填补  
 > 请求地址 http://ip:port/api/insert/{tableName}
+#### 请求体 单条数据
+```json
+{
+  "code": "11111",
+  "name": "11111"
+}
+```
+#### 响应:
+```json
+1
+```
+#### 请求体 批量数据
+```json
+[
+  {
+    "code": "11111",
+    "name": "11111"
+  },
+  {
+    "code": "22222",
+    "name": "22222"
+  }
+]
+```
+#### 响应:
+```json
+2
+```
+## <h3 id="2.2">2.2 修改<h3/>
+> 根据查询条件修改数据  
+> 请求地址 http://ip:port/api/update/{tableName}
+#### 请求体 单条数据
+```json
+{
+  "code": "33333",
+  "name": "33333",
+  "@where": [
+    {
+      "key": "id",
+      "condition": "eq",
+      "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
+    }
+  ]
+}
+```
+#### 响应:
+```json
+[
+  {
+    "code": "33333",
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "33333"
+  }
+]
+```
+#### 请求体 批量数据
+```json
+[
+  {
+    "code": "33333",
+    "name": "33333",
+    "@where": [
+      {
+        "key": "id",
+        "condition": "eq",
+        "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
+      }
+    ]
+  }
+]
+```
+#### 响应:
+```json
+[
+  [
+    {
+      "code": "33333",
+      "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+      "name": "33333"
+    }
+  ]
+]
+```
+## <h3 id="2.3">2.3 新增或修改<h3/>
+> 请求体包含id则根据id修改数据，不包含id则生成id新增数据    
+> 请求地址 http://ip:port/api/inertOrUpdate/{tableName}
 #### 请求体 单条数据
 ```json
 {
@@ -78,8 +165,8 @@ public class MybatisApiDemoApplication {
     "name": "11111"
   },
   {
-    "code": "22222",
-    "name": "22222"
+    "name": "33333",
+    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8"
   }
 ]
 ```
@@ -94,18 +181,18 @@ public class MybatisApiDemoApplication {
   {
     "code": "22222",
     "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-    "name": "22222"
+    "name": "33333"
   }
 ]
 ```
-###### <h4 id="2.1.1">2.1.1 自定义主键名称<h3/>
+###### <h4 id="2.3.1">2.3.1 自定义主键名称<h3/>
 ```yaml
 mybatis:
   api:
     id: id #数据库主键名称
 ```
 
-###### <h4 id="2.1.2">2.1.2 自定义生成主键值<h3/>
+###### <h4 id="2.3.2">2.3.2 自定义生成主键值<h3/>
 ```yaml
 mybatis:
   api:
@@ -274,107 +361,6 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
         return System.currentTimeMillis();
     }
 }
-```
-## <h3 id="2.2">2.2 修改<h3/>
-> 根据查询条件修改数据  
-> 请求地址 http://ip:port/api/update/{tableName}
-#### 请求体 单条数据
-```json
-{
-  "code": "33333",
-  "name": "33333",
-  "@where": [
-    {
-      "key": "id",
-      "condition": "eq",
-      "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
-    }
-  ]
-}
-```
-#### 响应:
-```json
-[
-  {
-    "code": "33333",
-    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "name": "33333"
-  }
-]
-```
-#### 请求体 批量数据
-```json
-[
-  {
-    "code": "33333",
-    "name": "33333",
-    "@where": [
-      {
-        "key": "id",
-        "condition": "eq",
-        "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
-      }
-    ]
-  }
-]
-```
-#### 响应:
-```json
-[
-  [
-    {
-      "code": "33333",
-      "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-      "name": "33333"
-    }
-  ]
-]
-```
-## <h3 id="2.3">2.3 新增和修改<h3/>
-> 请求体包含id则根据id修改数据，不包含id则生成id新增数据    
-> 请求地址 http://ip:port/api/inertOrUpdate/{tableName}
-#### 请求体 单条数据
-```json
-{
-  "code": "11111",
-  "name": "11111"
-}
-```
-#### 响应:
-```json
-{
-  "code": "22222",
-  "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-  "name": "22222"
-}
-```
-#### 请求体 批量数据
-```json
-[
-  {
-    "code": "11111",
-    "name": "11111"
-  },
-  {
-    "name": "33333",
-    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8"
-  }
-]
-```
-#### 响应:
-```json
-[
-  {
-    "code": "11111",
-    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "name": "11111"
-  },
-  {
-    "code": "22222",
-    "id": "d89cbafc-cf9f-445a-89fa-9cc53f8b55b8",
-    "name": "33333"
-  }
-]
 ```
 ## <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/{tableName}
@@ -547,9 +533,33 @@ public class CamelCaseMappingServiceImpl implements IMappingService {
 ```json
 2
 ```
-## <h3 id="2.6">2.6 请求基础路径<h3/>
+## <h3 id="2.6">2.6 groovy<h3/>
+传递值支持groovy代码，key以"(G)”结尾，value用groovy代码构成，注意要有返回值,例如  
+```http request
+POST http://localhost:8080/api/insertOrUpdate/sys_user
+Content-Type: application/json
+
+{
+  "name": "name",
+  "code": "code",
+  "password": "password",
+  "user_type": "super",
+  "create_time(G)":"import java.time.LocalDateTime;import java.time.format.DateTimeFormatter;return LocalDateTime.now().format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))"
+}
+```
+## <h3 id="2.7">2.7 请求基础路径<h3/>
 ```yaml
 mybatis:
   api:
     basePath: /api #访问接口基础路径,默认为/api
+```
+## <h3 id="2.8">2.8 自定义统一响应<h3/>
+```yaml
+mybatis:
+  api:
+    resultClass: cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl #自定义统一响应转换,默认不进行转换
+```
+继承IResultService接口后实现generalResult方法，并注册bean
+```java
+
 ```
