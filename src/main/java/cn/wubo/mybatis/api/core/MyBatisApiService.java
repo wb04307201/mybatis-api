@@ -36,7 +36,6 @@ public class MyBatisApiService {
     @Resource
     MyBatisApiMapper mapper;
 
-    @Transactional(rollbackFor = Exception.class)
     public Object parse(String method, String tableName, String context) {
         ObjectMapper objectMapper = new ObjectMapper();
         Object r;
@@ -91,6 +90,7 @@ public class MyBatisApiService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
@@ -102,6 +102,7 @@ public class MyBatisApiService {
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Object insertParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
@@ -113,6 +114,7 @@ public class MyBatisApiService {
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Object updateParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
@@ -124,6 +126,7 @@ public class MyBatisApiService {
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Object insertOrUpdateParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
             Object id;
