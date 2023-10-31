@@ -7,10 +7,18 @@
 * ## [1.如何使用](#1)
 * ## [2.语法 & 示例](#2)
 * #### [2.1 新增](#2.1)
+* ###### [2.1.1 新增单条数据](#2.1.1)
+* ###### [2.1.2 新增批量数据](#2.1.2)
+* ###### [2.1.3 新增后返回数据](#2.1.3)
 * #### [2.2 修改](#2.2)
+* ###### [2.2.1 修改单查询数据](#2.2.1)
+* ###### [2.2.2 修改多查询数据](#2.2.2)
+* ###### [2.2.3 修改后返回数据](#2.2.3)
 * #### [2.3 新增或修改](#2.3)
-* ###### [2.3.1 自定义主键名称](#2.3.1)
-* ###### [2.3.2 自定义生成主键值](#2.3.2)
+* ###### [2.3.1 单条数据](#2.3.1)
+* ###### [2.3.2 批量数据](#2.3.2)
+* ###### [2.3.3 自定义主键名称](#2.3.3)
+* ###### [2.3.4 自定义生成主键值](#2.3.4)
 * #### [2.4 查询](#2.4)
 * ###### [2.4.1 单表查询](#2.4.1)
 * ###### [2.4.2 分页查询](#2.4.2)
@@ -61,18 +69,20 @@ public class MybatisApiDemoApplication {
 [示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
 #### <h3 id="2.1">2.1 新增<h3/>
 > 请求地址 http://ip:port/api/insert/{tableName}
-#### 请求体 单条数据
+###### <h4 id="2.1.1">2.1.1 新增单条数据<h3/>
+请求体
 ```json
 {
   "code": "11111",
   "name": "11111"
 }
 ```
-#### 响应:
+响应
 ```json
 1
 ```
-#### 请求体 批量数据
+###### <h4 id="2.1.2">2.1.2 新增批量数据<h3/>
+请求体
 ```json
 [
   {
@@ -85,14 +95,45 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-#### 响应:
+响应:
 ```json
 2
 ```
+###### <h4 id="2.1.3">2.1.3 新增后返回数据<h3/>
+可使用@with_select添加查询条件返回数据  
+请求体
+```json
+{
+  "id": "id-test-001",
+  "code": "11111",
+  "name": "11111",
+  "@with_select": {
+    "@column": "id,code,name",
+    "@where": [
+      {
+        "key": "id",
+        "value": "id-test-001"
+      }
+    ]
+  }
+}
+```
+响应
+```json
+[
+  {
+    "code": "11111",
+    "id": "id-test-001",
+    "name": "11111"
+  }
+]
+```
+
 ## <h3 id="2.2">2.2 修改<h3/>
 > 根据查询条件修改数据  
 > 请求地址 http://ip:port/api/update/{tableName}
-#### 请求体 单条数据
+###### <h4 id="2.2.1">2.2.1 修改单查询数据<h3/>
+请求体
 ```json
 {
   "code": "33333",
@@ -106,17 +147,12 @@ public class MybatisApiDemoApplication {
   ]
 }
 ```
-#### 响应:
+响应:
 ```json
-[
-  {
-    "code": "33333",
-    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-    "name": "33333"
-  }
-]
+1
 ```
-#### 请求体 批量数据
+###### <h4 id="2.2.2">2.2.2 修改多查询数据<h3/>
+请求体
 ```json
 [
   {
@@ -129,32 +165,74 @@ public class MybatisApiDemoApplication {
         "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
       }
     ]
+  },
+  {
+    "code": "4444",
+    "name": "4444",
+    "@where": [
+      {
+        "key": "id",
+        "condition": "eq",
+        "value": "001-001-001"
+      }
+    ]
   }
 ]
 ```
-#### 响应:
+响应:
 ```json
 [
-  [
+  1,
+  1
+]
+```
+###### <h4 id="2.2.3">2.2.3 修改后返回数据<h3/>
+可使用@with_select添加查询条件返回数据
+请求体
+```json
+{
+  "code": "33333",
+  "name": "33333",
+  "@where": [
     {
-      "code": "33333",
-      "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
-      "name": "33333"
+      "key": "id",
+      "condition": "eq",
+      "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
     }
-  ]
+  ],
+  "@with_select": {
+    "@column": "id,code,name",
+    "@where": [
+      {
+        "key": "id",
+        "value": "417f6982-0e16-45cc-b1d4-51aa070c74d8"
+      }
+    ]
+  }
+}
+```
+响应:
+```json
+[
+  {
+    "code": "33333",
+    "id": "417f6982-0e16-45cc-b1d4-51aa070c74d8",
+    "name": "33333"
+  }
 ]
 ```
 ## <h3 id="2.3">2.3 新增或修改<h3/>
 > 请求体包含id则根据id修改数据，不包含id则生成id新增数据    
 > 请求地址 http://ip:port/api/inertOrUpdate/{tableName}
-#### 请求体 单条数据
+###### <h4 id="2.3.1">2.3.1 单条数据<h3/>
+请求体
 ```json
 {
   "code": "11111",
   "name": "11111"
 }
 ```
-#### 响应:
+响应
 ```json
 {
   "code": "22222",
@@ -162,7 +240,8 @@ public class MybatisApiDemoApplication {
   "name": "22222"
 }
 ```
-#### 请求体 批量数据
+###### <h4 id="2.3.2">2.3.2 批量数据<h3/>
+请求体
 ```json
 [
   {
@@ -175,7 +254,7 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-#### 响应:
+响应
 ```json
 [
   {
@@ -190,14 +269,14 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-###### <h4 id="2.3.1">2.3.1 自定义主键名称<h3/>
+###### <h4 id="2.3.3">2.3.3 自定义主键名称<h3/>
 ```yaml
 mybatis:
   api:
     id: id id #数据库主键名称，默认为id
 ```
 
-###### <h4 id="2.3.2">2.3.2 自定义生成主键值<h3/>
+###### <h4 id="2.3.4">2.3.4 自定义生成主键值<h3/>
 继承IDService接口后实现generalID方法，并注册bean
 ```java
 @Component
@@ -371,7 +450,7 @@ mybatis:
 ## <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/{tableName}
 ###### <h4 id="2.4.1">2.4.1 单表查询<h3/>
-#### 请求体:
+请求体
 ```json
 {
   "@column": "id,name",
@@ -383,7 +462,7 @@ mybatis:
   ]
 }
 ```
-#### 响应:
+响应
 ```json
 [
   {
@@ -401,7 +480,7 @@ mybatis:
 ]
 ```
 ###### <h4 id="2.4.2">2.4.2 分页查询<h3/>
-#### 请求体:
+请求体
 ```json
 {
   "@where": [
@@ -416,7 +495,7 @@ mybatis:
   }
 }
 ```
-#### 响应:
+响应
 ```json
 {
   "total": 4,
@@ -451,7 +530,7 @@ mybatis:
 }
 ```
 ###### <h4 id="2.4.3">2.4.3 多表关联查询<h3/>
-#### 请求体:
+请求体
 ```json
 {
   "@column": "person.id,person.name,person.deptcode,dept.name",
@@ -466,7 +545,7 @@ mybatis:
   }
 }
 ```
-#### 响应:
+响应
 ```json
 [
   {
@@ -479,7 +558,7 @@ mybatis:
 > @join支持join，inner_join，left_outer_join，right_outer_join，outer_join
 > @where condition支持eq,ueq,like,ulike,llike,rlike,gt,lt,gteq,lteq,between,notbetween,in,notin,null,notnull
 ###### <h4 id="2.4.4">2.4.4 分组查询<h3/>
-#### 请求体:
+请求体
 ```json
 {
   "@column": "deptcode,count(1) as personcount",
@@ -494,7 +573,7 @@ mybatis:
   ]
 }
 ```
-#### 响应:
+响应
 ```json
 [
   {
@@ -542,7 +621,8 @@ mybatis:
 
 ## <h3 id="2.5">2.5 删除<h3/>
 > 请求地址 http://ip:port/api/delete/{tableName}
-#### 请求体:
+
+请求体
 ```json
 {
   "@where": [
@@ -557,7 +637,7 @@ mybatis:
   ]
 }
 ```
-#### 响应:
+响应
 ```json
 2
 ```
