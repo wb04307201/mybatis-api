@@ -14,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static cn.wubo.mybatis.api.core.Constant.VALUE;
@@ -61,15 +62,7 @@ public class MyBatisApiService {
         return resultService.generalResult(r);
     }
 
-    private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
-        return list.stream().map(map -> {
-            Map<String, Object> newMap = new HashMap<>();
-            map.entrySet().stream().forEach(enrty -> newMap.put(mappingService.parseKey(enrty.getKey()), enrty.getValue()));
-            return newMap;
-        }).collect(Collectors.toList());
-    }
-
-    private Object selectParse(ObjectMapper objectMapper, String tableName, String context) {
+    public Object selectParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             Map<String, Object> params = objectMapper.readValue(context, new TypeReference<Map<String, Object>>() {
             });
@@ -98,91 +91,92 @@ public class MyBatisApiService {
         }
     }
 
-    private Integer deleteParse(ObjectMapper objectMapper, String tableName, String context) {
-        try {
-            JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
-            if (rootNode.isArray()) {
-                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().mapToInt(row -> mapper.delete(tableName, row)).sum();
+    public Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
+        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+            if (row.containsKey(Constant.WITH_SELECT)) {
+                mapper.delete(tn, row);
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
             } else {
-                return mapper.delete(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                }));
+                return mapper.delete(tn, row);
             }
-        } catch (JsonProcessingException e) {
-            throw new MyBatisApiException(e.getMessage(), e);
-        }
+        });
     }
 
-    private Integer insertParse(ObjectMapper objectMapper, String tableName, String context) {
-        try {
-            JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
-            if (rootNode.isArray()) {
-                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().mapToInt(row -> mapper.insert(tableName, row)).sum();
+    public Object insertParse(ObjectMapper objectMapper, String tableName, String context) {
+        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+            if (row.containsKey(Constant.WITH_SELECT)) {
+                mapper.insert(tn, row);
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
             } else {
-                return mapper.insert(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                }));
+                return mapper.insert(tn, row);
             }
-        } catch (JsonProcessingException e) {
-            throw new MyBatisApiException(e.getMessage(), e);
-        }
+        });
     }
 
-    private Object updateParse(ObjectMapper objectMapper, String tableName, String context) {
-        try {
-            JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
-            if (rootNode.isArray()) {
-                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().map(row -> doUpdate(tableName, row)).collect(Collectors.toList());
+    public Object updateParse(ObjectMapper objectMapper, String tableName, String context) {
+        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+            if (row.containsKey(Constant.WITH_SELECT)) {
+                mapper.update(tn, row);
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
             } else {
-                return doUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                }));
+                return mapper.update(tn, row);
             }
-        } catch (JsonProcessingException e) {
-            throw new MyBatisApiException(e.getMessage(), e);
-        }
-    }
-
-    private List<Map<String, Object>> doUpdate(String tableName, Map<String, Object> params) {
-        mapper.update(tableName, params);
-        Map<String, Object> query = new HashMap<>();
-        query.put(Constant.WHERE, params.get(Constant.WHERE));
-        return mapParse(mapper.select(tableName, query));
+        });
     }
 
     public Object insertOrUpdateParse(ObjectMapper objectMapper, String tableName, String context) {
+        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+            Object id;
+            if (!row.containsKey(myBatisApiProperties.getId()) || "".equals(row.get(myBatisApiProperties.getId()))) {
+                id = idService.generalID();
+                row.put(myBatisApiProperties.getId(), id);
+                mapper.insert(tableName, row);
+            } else {
+                id = String.valueOf(row.get(myBatisApiProperties.getId()));
+                row.remove(myBatisApiProperties.getId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("key", myBatisApiProperties.getId());
+                map.put(VALUE, id);
+                row.put(Constant.WHERE, Collections.singletonList(map));
+                mapper.update(tableName, row);
+            }
+            Map<String, Object> query = new HashMap<>();
+            query.put("key", myBatisApiProperties.getId());
+            query.put(VALUE, id);
+            return mapParse(mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query)))).get(0);
+        });
+    }
+
+    private Object doWhat(ObjectMapper objectMapper, String tableName, String context, BiFunction<String, Map<String, Object>, Object> biFunction) {
         try {
             JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
             if (rootNode.isArray()) {
-                return objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
-                }).stream().map(row -> insertOrUpdate(tableName, row)).collect(Collectors.toList());
+                List<Map<String, Object>> rows = objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                });
+                List<Object> objects = new ArrayList<>();
+                for (Map<String, Object> row : rows)
+                    objects.add(biFunction.apply(tableName, row));
+                return objects;
             } else {
-                return insertOrUpdate(tableName, objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
-                }));
+                Map<String, Object> row = objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                });
+                return biFunction.apply(tableName, row);
             }
         } catch (JsonProcessingException e) {
             throw new MyBatisApiException(e.getMessage(), e);
         }
     }
 
-    public Map<String, Object> insertOrUpdate(String tableName, Map<String, Object> params) {
-        Object id;
-        if (!params.containsKey(myBatisApiProperties.getId()) || "".equals(params.get(myBatisApiProperties.getId()))) {
-            id = idService.generalID();
-            params.put(myBatisApiProperties.getId(), id);
-            mapper.insert(tableName, params);
-        } else {
-            id = String.valueOf(params.get(myBatisApiProperties.getId()));
-            params.remove(myBatisApiProperties.getId());
-            Map<String, Object> map = new HashMap<>();
-            map.put("key", myBatisApiProperties.getId());
-            map.put(VALUE, id);
-            params.put(Constant.WHERE, Collections.singletonList(map));
-            mapper.update(tableName, params);
-        }
-        Map<String, Object> query = new HashMap<>();
-        query.put("key", myBatisApiProperties.getId());
-        query.put(VALUE, id);
-        return mapParse(mapper.select(tableName, Collections.singletonMap(Constant.WHERE, Collections.singletonList(query)))).get(0);
+    /**
+     * 处理返回的结果集
+     * @param list
+     * @return
+     */
+    private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
+        return list.stream().map(map -> {
+            Map<String, Object> newMap = new HashMap<>();
+            map.entrySet().stream().forEach(enrty -> newMap.put(mappingService.parseKey(enrty.getKey()), enrty.getValue()));
+            return newMap;
+        }).collect(Collectors.toList());
     }
 }

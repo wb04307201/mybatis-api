@@ -6,6 +6,7 @@ public class Constant {
     }
 
     public static final String WHERE = "@where";
+    public static final String WITH_SELECT = "@with_select";
     public static final String COLUMN = "@column";
     public static final String PAGE = "@page";
     public static final String JOIN = "@join";
