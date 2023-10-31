@@ -1,23 +1,21 @@
 package cn.wubo.mybatis.api.config;
 
-import cn.wubo.mybatis.api.core.result.IResultService;
-import cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl;
-import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import cn.wubo.mybatis.api.core.MyBatisApiService;
 import cn.wubo.mybatis.api.core.id.IDService;
 import cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl;
 import cn.wubo.mybatis.api.core.mapping.IMappingService;
 import cn.wubo.mybatis.api.core.mapping.impl.LowerCaseMappingServiceImpl;
+import cn.wubo.mybatis.api.core.result.IResultService;
+import cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl;
+import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
 
 import java.util.List;
@@ -52,24 +50,26 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices,List<IResultService<?>> iResultServices) {
+    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices, List<IResultService<?>> iResultServices) {
         IDService<?> idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
         IMappingService mappingService = mappingServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getMappingClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IMappingService！", myBatisApiProperties.getMappingClass())));
         IResultService<?> resultService = iResultServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getResultClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IResultService！", myBatisApiProperties.getResultClass())));
-        return new MyBatisApiService(myBatisApiProperties, idService, mappingService,resultService);
+        return new MyBatisApiService(myBatisApiProperties, idService, mappingService, resultService);
     }
 
     @Bean
-    @ConditionalOnExpression("'true'.equals('${mybatis.api.enableRouter}')")
     public RouterFunction<ServerResponse> myBatisApiRouter(MyBatisApiService myBatisApiService) {
-        if (!myBatisApiProperties.getBasePath().startsWith("/") || myBatisApiProperties.getBasePath().endsWith("/"))
-            throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
-
-        return route().POST(myBatisApiProperties.getBasePath() + "/{method}/{tableName}", accept(MediaType.APPLICATION_JSON), request -> {
-            String method = request.pathVariable("method");
-            String tableName = request.pathVariable("tableName");
-            return ServerResponse.status(HttpStatus.OK).body(myBatisApiService.parse(method, tableName, request.body(String.class)));
-        }).build();
+        RouterFunctions.Builder builder = route();
+        if (Boolean.TRUE.equals(myBatisApiProperties.getEnableRouter())) {
+            if (!myBatisApiProperties.getBasePath().startsWith("/") || myBatisApiProperties.getBasePath().endsWith("/"))
+                throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
+            builder.POST(myBatisApiProperties.getBasePath() + "/{method}/{tableName}", accept(MediaType.APPLICATION_JSON), request -> {
+                String method = request.pathVariable("method");
+                String tableName = request.pathVariable("tableName");
+                return ServerResponse.status(HttpStatus.OK).body(myBatisApiService.parse(method, tableName, request.body(String.class)));
+            });
+        }
+        return builder.build();
     }
 
 }

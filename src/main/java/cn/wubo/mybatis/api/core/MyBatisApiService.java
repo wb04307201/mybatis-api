@@ -39,24 +39,24 @@ public class MyBatisApiService {
     /**
      * 公共
      */
-    public Object parse(String method, String tableName, String context) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    @Transactional(rollbackFor = Exception.class)
+    public Object parse(String method, String tableName, String jsonStr) {
         Object r;
         switch (method) {
             case "select":
-                r = selectParse(objectMapper, tableName, context);
+                r = selectParse(tableName, jsonStr);
                 break;
             case "insert":
-                r = insertParse(objectMapper, tableName, context);
+                r = insertParse(tableName, jsonStr);
                 break;
             case "update":
-                r = updateParse(objectMapper, tableName, context);
+                r = updateParse(tableName, jsonStr);
                 break;
             case "insertOrUpdate":
-                r = insertOrUpdateParse(objectMapper, tableName, context);
+                r = insertOrUpdateParse(tableName, jsonStr);
                 break;
             case "delete":
-                r = deleteParse(objectMapper, tableName, context);
+                r = deleteParse(tableName, jsonStr);
                 break;
             default:
                 throw new MyBatisApiException(String.format("method [%s] value not valid", method));
@@ -67,9 +67,10 @@ public class MyBatisApiService {
     /**
      * 查询
      */
-    public Object selectParse(ObjectMapper objectMapper, String tableName, String context) {
+    public Object selectParse(String tableName, String jsonStr) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Map<String, Object> params = objectMapper.readValue(context, new TypeReference<Map<String, Object>>() {
+            Map<String, Object> params = objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>() {
             });
 
             Optional<Map.Entry<String, Object>> param = params.entrySet().stream().filter(entry -> entry.getKey().equals(Constant.PAGE)).findAny();
@@ -80,7 +81,7 @@ public class MyBatisApiService {
                 pageVO.setPageIndex((long) (p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (int) p.get(Constant.PAGE_INDEX) : 0));
                 pageVO.setPageSize((long) (p.containsKey(Constant.PAGE_SIZE) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_SIZE)) ? (int) p.get(Constant.PAGE_SIZE) : 10));
 
-                Map<String, Object> countParams = objectMapper.readValue(context, new TypeReference<Map<String, Object>>() {
+                Map<String, Object> countParams = objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>() {
                 });
                 countParams.put("@column", "count(1) as TOTAL");
                 countParams.remove(Constant.PAGE);
@@ -100,8 +101,8 @@ public class MyBatisApiService {
      * 删除
      */
     @Transactional(rollbackFor = Exception.class)
-    public Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
-        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+    public Object deleteParse(String tableName, String jsonStr) {
+        return doWhat(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.delete(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -115,8 +116,8 @@ public class MyBatisApiService {
      * 插入
      */
     @Transactional(rollbackFor = Exception.class)
-    public Object insertParse(ObjectMapper objectMapper, String tableName, String context) {
-        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+    public Object insertParse(String tableName, String jsonStr) {
+        return doWhat(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.insert(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -130,8 +131,8 @@ public class MyBatisApiService {
      * 更新
      */
     @Transactional(rollbackFor = Exception.class)
-    public Object updateParse(ObjectMapper objectMapper, String tableName, String context) {
-        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+    public Object updateParse(String tableName, String jsonStr) {
+        return doWhat(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.update(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -145,8 +146,8 @@ public class MyBatisApiService {
      * 根据id插入或更新
      */
     @Transactional(rollbackFor = Exception.class)
-    public Object insertOrUpdateParse(ObjectMapper objectMapper, String tableName, String context) {
-        return doWhat(objectMapper, tableName, context, (tn, row) -> {
+    public Object insertOrUpdateParse(String tableName, String jsonStr) {
+        return doWhat(tableName, jsonStr, (tn, row) -> {
             Object id;
             if (!row.containsKey(myBatisApiProperties.getId()) || "".equals(row.get(myBatisApiProperties.getId()))) {
                 id = idService.generalID();
@@ -159,7 +160,8 @@ public class MyBatisApiService {
                 map.put("key", myBatisApiProperties.getId());
                 map.put(VALUE, id);
                 row.put(Constant.WHERE, Collections.singletonList(map));
-                mapper.update(tableName, row);
+                if (mapper.update(tableName, row) != 1)
+                    throw new MyBatisApiException(String.format("%s value %s not unique!", myBatisApiProperties.getId(), id));
             }
             Map<String, Object> query = new HashMap<>();
             query.put("key", myBatisApiProperties.getId());
@@ -168,9 +170,10 @@ public class MyBatisApiService {
         });
     }
 
-    private Object doWhat(ObjectMapper objectMapper, String tableName, String context, BiFunction<String, Map<String, Object>, Object> biFunction) {
+    private Object doWhat(String tableName, String jsonStr, BiFunction<String, Map<String, Object>, Object> biFunction) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode rootNode = objectMapper.readValue(context, JsonNode.class);
+            JsonNode rootNode = objectMapper.readValue(jsonStr, JsonNode.class);
             if (rootNode.isArray()) {
                 List<Map<String, Object>> rows = objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
                 });

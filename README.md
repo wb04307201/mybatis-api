@@ -30,6 +30,7 @@
 * #### [2.6 groovy](#2.6)
 * #### [2.7 请求基础路径](#2.7)
 * #### [2.8 自定义统一响应](#2.8)
+* #### [2.9 其他使用的方式](#2.9)
 
 
 ## <h2 id="1">1.如何使用<h2/>
@@ -48,7 +49,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </dependency>
 ```
 
@@ -677,4 +678,16 @@ public class ResponseResultServiceImpl implements IResultService<ResponseEntity<
 mybatis:
   api:
     resultClass: cn.wubo.mybatis.api.demo.ResponseResultServiceImpl #自定义统一响应转换,,默认不进行转换,示例为ResponseEntity
+```
+## <h3 id="2.9">2.9 其他使用的方式<h3/>
+```java
+// 注入MyBatisApiService
+@Autowired
+MyBatisApiService myBatisApiService;
+// 通过myBatisApiService调用方法
+myBatisApiService.insertParse
+myBatisApiService.updateParse
+myBatisApiService.insertOrUpdateParse
+myBatisApiService.deleteParse
+myBatisApiService.selectParse
 ```
