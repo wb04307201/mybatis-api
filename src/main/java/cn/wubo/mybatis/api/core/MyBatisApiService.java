@@ -36,6 +36,9 @@ public class MyBatisApiService {
     @Resource
     MyBatisApiMapper mapper;
 
+    /**
+     * 公共
+     */
     public Object parse(String method, String tableName, String context) {
         ObjectMapper objectMapper = new ObjectMapper();
         Object r;
@@ -61,6 +64,9 @@ public class MyBatisApiService {
         return resultService.generalResult(r);
     }
 
+    /**
+     * 查询
+     */
     public Object selectParse(ObjectMapper objectMapper, String tableName, String context) {
         try {
             Map<String, Object> params = objectMapper.readValue(context, new TypeReference<Map<String, Object>>() {
@@ -90,6 +96,9 @@ public class MyBatisApiService {
         }
     }
 
+    /**
+     * 删除
+     */
     @Transactional(rollbackFor = Exception.class)
     public Object deleteParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
@@ -102,6 +111,9 @@ public class MyBatisApiService {
         });
     }
 
+    /**
+     * 插入
+     */
     @Transactional(rollbackFor = Exception.class)
     public Object insertParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
@@ -114,6 +126,9 @@ public class MyBatisApiService {
         });
     }
 
+    /**
+     * 更新
+     */
     @Transactional(rollbackFor = Exception.class)
     public Object updateParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
@@ -126,6 +141,9 @@ public class MyBatisApiService {
         });
     }
 
+    /**
+     * 根据id插入或更新
+     */
     @Transactional(rollbackFor = Exception.class)
     public Object insertOrUpdateParse(ObjectMapper objectMapper, String tableName, String context) {
         return doWhat(objectMapper, tableName, context, (tn, row) -> {
@@ -172,8 +190,6 @@ public class MyBatisApiService {
 
     /**
      * 处理返回的结果集
-     * @param list
-     * @return
      */
     private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
         return list.stream().map(map -> {
