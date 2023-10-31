@@ -9,6 +9,9 @@ import cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl;
 import cn.wubo.mybatis.api.core.mapping.IMappingService;
 import cn.wubo.mybatis.api.core.mapping.impl.LowerCaseMappingServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,6 +60,7 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
+    @ConditionalOnExpression("'true'.equals('${mybatis.api.enableRouter}')")
     public RouterFunction<ServerResponse> myBatisApiRouter(MyBatisApiService myBatisApiService) {
         if (!myBatisApiProperties.getBasePath().startsWith("/") || myBatisApiProperties.getBasePath().endsWith("/"))
             throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
