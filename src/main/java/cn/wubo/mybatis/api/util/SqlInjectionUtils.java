@@ -11,8 +11,15 @@ public class SqlInjectionUtils {
     private SqlInjectionUtils() {
     }
 
+    /**
+     * 检查给定的字符串是否包含SQL注释或语法
+     *
+     * @param value 待检查的字符串
+     * @return 如果字符串包含SQL注释或语法则返回true，否则返回false
+     */
     public static boolean check(String value) {
         Objects.requireNonNull(value);
         return SQL_COMMENT_PATTERN.matcher(value).find() || SQL_SYNTAX_PATTERN.matcher(value).find();
     }
+
 }
