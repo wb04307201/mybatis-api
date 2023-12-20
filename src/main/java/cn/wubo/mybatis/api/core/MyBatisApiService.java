@@ -37,7 +37,12 @@ public class MyBatisApiService {
     MyBatisApiMapper mapper;
 
     /**
-     * 公共
+     * 解析方法，根据传入的方法名称和参数，执行不同的数据库操作
+     *
+     * @param method    方法名称
+     * @param tableName 表名
+     * @param jsonStr   JSON字符串
+     * @return 操作结果
      */
     @Transactional(rollbackFor = Exception.class)
     public Object parse(String method, String tableName, String jsonStr) {
@@ -64,32 +69,44 @@ public class MyBatisApiService {
         return resultService.generalResult(r);
     }
 
+
     /**
      * 查询
+     *
+     * @param tableName 数据表名
+     * @param jsonStr   包含查询参数的JSON字符串
+     * @return 查询结果
      */
     public Object selectParse(String tableName, String jsonStr) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            // 解析JSON字符串
             Map<String, Object> params = objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>() {
             });
 
+            // 获取分页参数
             Optional<Map.Entry<String, Object>> param = params.entrySet().stream().filter(entry -> entry.getKey().equals(Constant.PAGE)).findAny();
             if (param.isPresent()) {
                 PageVO pageVO = new PageVO();
 
                 Map<String, Object> p = (Map<String, Object>) param.get().getValue();
+                // 设置分页参数
                 pageVO.setPageIndex((long) (p.containsKey(Constant.PAGE_INDEX) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_INDEX)) ? (int) p.get(Constant.PAGE_INDEX) : 0));
                 pageVO.setPageSize((long) (p.containsKey(Constant.PAGE_SIZE) && !ObjectUtils.isEmpty(p.get(Constant.PAGE_SIZE)) ? (int) p.get(Constant.PAGE_SIZE) : 10));
 
+                // 获取总数参数
                 Map<String, Object> countParams = objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>() {
                 });
                 countParams.put("@column", "count(1) as TOTAL");
                 countParams.remove(Constant.PAGE);
+                // 查询总数
                 pageVO.setTotal((Long) mapper.select(tableName, countParams).get(0).get("TOTAL"));
 
+                // 查询数据记录
                 pageVO.setRecords(mapParse(mapper.select(tableName, params)));
                 return pageVO;
             } else {
+                // 查询数据记录
                 return mapParse(mapper.select(tableName, params));
             }
         } catch (JsonProcessingException e) {
@@ -97,8 +114,9 @@ public class MyBatisApiService {
         }
     }
 
+
     /**
-     * 删除
+     * 删除数据
      */
     @Transactional(rollbackFor = Exception.class)
     public Object deleteParse(String tableName, String jsonStr) {
@@ -111,6 +129,7 @@ public class MyBatisApiService {
             }
         });
     }
+
 
     /**
      * 插入
@@ -170,11 +189,20 @@ public class MyBatisApiService {
         });
     }
 
+    /**
+     * 执行具体的操作
+     *
+     * @param tableName  表名
+     * @param jsonStr    JSON字符串
+     * @param biFunction 双函数接口
+     * @return 执行结果
+     */
     private Object doWhat(String tableName, String jsonStr, BiFunction<String, Map<String, Object>, Object> biFunction) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             JsonNode rootNode = objectMapper.readValue(jsonStr, JsonNode.class);
             if (rootNode.isArray()) {
+                // 如果根节点是一个数组
                 List<Map<String, Object>> rows = objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
                 });
                 List<Object> objects = new ArrayList<>();
@@ -182,6 +210,7 @@ public class MyBatisApiService {
                     objects.add(biFunction.apply(tableName, row));
                 return objects;
             } else {
+                // 如果根节点是一个对象
                 Map<String, Object> row = objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
                 });
                 return biFunction.apply(tableName, row);
@@ -191,8 +220,12 @@ public class MyBatisApiService {
         }
     }
 
+
     /**
      * 处理返回的结果集
+     *
+     * @param list 传入的结果集
+     * @return 处理后的结果集
      */
     private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
         return list.stream().map(map -> {
