@@ -51,7 +51,8 @@ public class MyBatisApiConfiguration {
 
     /**
      * 创建一个MyBatisApiService对象
-     * @param idServices ID服务的列表
+     *
+     * @param idServices      ID服务的列表
      * @param mappingServices 映射服务的列表
      * @param iResultServices 结果服务的列表
      * @return 创建的MyBatisApiService对象
@@ -99,6 +100,5 @@ public class MyBatisApiConfiguration {
         // 构建并返回路由函数
         return builder.build();
     }
-
 
 }
