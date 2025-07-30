@@ -1,4 +1,4 @@
-package cn.wubo.mybatis.api.core.mapping;
+package cn.wubo.mybatis.api.core.service.mapping;
 
 public interface IMappingService {
 

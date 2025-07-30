@@ -18,8 +18,9 @@ public class Builder {
 
     /**
      * 选择查询
+     *
      * @param tableName 表名
-     * @param params 查询参数
+     * @param params    查询参数
      * @return SQL语句
      */
     public String select(String tableName, Map<String, Object> params) {
@@ -51,13 +52,19 @@ public class Builder {
 
     /**
      * 插入数据到指定表中
+     *
      * @param tableName 表名
-     * @param params 插入的数据参数，键为字段名，值为字段值
+     * @param params    插入的数据参数，键为字段名，值为字段值
      * @return 返回插入的SQL语句
      */
     public String insert(String tableName, Map<String, Object> params) {
         SQL sql = new SQL().INSERT_INTO(tableName);
-        params.entrySet().stream().filter(entry -> !entry.getKey().startsWith(Constant.AT)).forEach(entry -> sql.VALUES(getKeyStr(entry.getKey()), getValueStr(entry.getKey(), entry.getValue())));
+        // 过滤掉以Constant.AT开头的键，并添加VALUES子句
+        // @formatter:off
+        params.entrySet().stream()
+                .filter(entry -> !entry.getKey().startsWith(Constant.AT))
+                .forEach(entry -> sql.VALUES(getKeyStr(entry.getKey()), getValueStr(entry.getKey(), entry.getValue())));
+        // @formatter:on
         return sql.toString();
     }
 
@@ -66,7 +73,7 @@ public class Builder {
      * 更新指定表中的数据
      *
      * @param tableName 表名
-     * @param params 更新的字段和值
+     * @param params    更新的字段和值
      * @return 更新后的SQL语句
      */
     public String update(String tableName, Map<String, Object> params) {
@@ -94,10 +101,11 @@ public class Builder {
 
     /**
      * 解析连接操作。
-     * @param sql SQL对象
+     *
+     * @param sql  SQL对象
      * @param join 连接信息
-     *  - join: 连接类型
-     *  - v: 连接的表
+     *             - join: 连接类型
+     *             - v: 连接的表
      */
     private void parseJoin(SQL sql, Object join) {
         Map<String, String> j = (Map<String, String>) join;
@@ -113,7 +121,8 @@ public class Builder {
 
     /**
      * 解析where条件
-     * @param sql SQL对象
+     *
+     * @param sql   SQL对象
      * @param where where条件集合
      */
     private void parseWhere(SQL sql, Object where) {
@@ -163,7 +172,8 @@ public class Builder {
 
     /**
      * 解析分页参数，设置SQL的偏移量和限制结果数量
-     * @param sql SQL对象
+     *
+     * @param sql  SQL对象
      * @param page 分页参数
      */
     private void parsePage(SQL sql, Object page) {
@@ -184,7 +194,7 @@ public class Builder {
     /**
      * 解析分组信息，设置SQL的分组字段
      *
-     * @param sql SQL对象
+     * @param sql   SQL对象
      * @param group 分组字段
      */
     private void parseGroup(SQL sql, Object group) {
@@ -202,8 +212,9 @@ public class Builder {
 
     /**
      * 从指定的参数Map中找到第一个键与给定key相等的Entry，并返回一个Optional对象
+     *
      * @param params 参数Map
-     * @param key 要查找的键
+     * @param key    要查找的键
      * @return 包含找到的Entry的Optional对象，如果未找到则返回空的Optional对象
      */
     private Optional<Map.Entry<String, Object>> findAny(Map<String, Object> params, String key) {
@@ -220,10 +231,11 @@ public class Builder {
 
     /**
      * 根据给定的key和valueObj获取对应的字符串值
-     * @param key 键
+     *
+     * @param key      键
      * @param valueObj 值对象
      * @param isUpdate 是否是更新操作
-     * @param isLike 是否忽略大小写
+     * @param isLike   是否忽略大小写
      * @return 对应的字符串值
      */
     private String getValueStr(String key, Object valueObj, Boolean isUpdate, Boolean isLike) {
@@ -253,6 +265,7 @@ public class Builder {
 
     /**
      * 对给定的字符串进行大写处理并返回
+     *
      * @param keyStr 待处理的字符串
      * @return 大写处理后的字符串
      */

@@ -1,5 +1,6 @@
-package cn.wubo.mybatis.api.core;
+package cn.wubo.mybatis.api.core.mapper;
 
+import cn.wubo.mybatis.api.core.Builder;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

@@ -1,18 +1,21 @@
-package cn.wubo.mybatis.api.core;
+package cn.wubo.mybatis.api.core.service;
 
 import cn.wubo.mybatis.api.config.MyBatisApiProperties;
-import cn.wubo.mybatis.api.core.id.IDService;
-import cn.wubo.mybatis.api.core.mapping.IMappingService;
-import cn.wubo.mybatis.api.core.result.IResultService;
+import cn.wubo.mybatis.api.core.Constant;
+import cn.wubo.mybatis.api.core.mapper.MyBatisApiMapper;
+import cn.wubo.mybatis.api.core.PageVO;
+import cn.wubo.mybatis.api.core.service.id.IDService;
+import cn.wubo.mybatis.api.core.service.mapping.IMappingService;
+import cn.wubo.mybatis.api.core.service.result.IResultService;
 import cn.wubo.mybatis.api.exception.MyBatisApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -25,16 +28,17 @@ public class MyBatisApiService {
     private final IDService<?> idService;
     private final IMappingService mappingService;
     private final IResultService<?> resultService;
+    private MyBatisApiMapper mapper;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties, IDService<?> idService, IMappingService mappingService, IResultService<?> resultService) {
+
+    public MyBatisApiService(MyBatisApiProperties myBatisApiProperties, IDService<?> idService, IMappingService mappingService, IResultService<?> resultService,MyBatisApiMapper mapper) {
         this.myBatisApiProperties = myBatisApiProperties;
         this.idService = idService;
         this.mappingService = mappingService;
         this.resultService = resultService;
+        this.mapper = mapper;
     }
-
-    @Resource
-    MyBatisApiMapper mapper;
 
     /**
      * 解析方法，根据传入的方法名称和参数，执行不同的数据库操作
@@ -46,25 +50,41 @@ public class MyBatisApiService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Object parse(String method, String tableName, String jsonStr) {
+        // 参数校验
+        if (method == null || method.trim().isEmpty()) {
+            throw new MyBatisApiException("method cannot be null or empty");
+        }
+        if (tableName == null || tableName.trim().isEmpty()) {
+            throw new MyBatisApiException("tableName cannot be null or empty");
+        }
+        if (jsonStr == null || jsonStr.trim().isEmpty()) {
+            throw new MyBatisApiException("jsonStr cannot be null or empty");
+        }
+
         Object r;
-        switch (method) {
-            case "select":
-                r = selectParse(tableName, jsonStr);
-                break;
-            case "insert":
-                r = insertParse(tableName, jsonStr);
-                break;
-            case "update":
-                r = updateParse(tableName, jsonStr);
-                break;
-            case "insertOrUpdate":
-                r = insertOrUpdateParse(tableName, jsonStr);
-                break;
-            case "delete":
-                r = deleteParse(tableName, jsonStr);
-                break;
-            default:
-                throw new MyBatisApiException(String.format("method [%s] value not valid", method));
+        try {
+            switch (method) {
+                case "select":
+                    r = selectParse(tableName, jsonStr);
+                    break;
+                case "insert":
+                    r = insertParse(tableName, jsonStr);
+                    break;
+                case "update":
+                    r = updateParse(tableName, jsonStr);
+                    break;
+                case "insertOrUpdate":
+                    r = insertOrUpdateParse(tableName, jsonStr);
+                    break;
+                case "delete":
+                    r = deleteParse(tableName, jsonStr);
+                    break;
+                default:
+                    throw new MyBatisApiException(String.format("method [%s] value not valid", method));
+            }
+        } catch (Exception e) {
+            // 重新抛出异常以确保事务回滚，并保持异常信息
+            throw new MyBatisApiException(e.getMessage(), e);
         }
         return resultService.generalResult(r);
     }
@@ -120,7 +140,7 @@ public class MyBatisApiService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Object deleteParse(String tableName, String jsonStr) {
-        return doWhat(tableName, jsonStr, (tn, row) -> {
+        return doFunction(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.delete(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -136,7 +156,7 @@ public class MyBatisApiService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Object insertParse(String tableName, String jsonStr) {
-        return doWhat(tableName, jsonStr, (tn, row) -> {
+        return doFunction(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.insert(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -151,7 +171,7 @@ public class MyBatisApiService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Object updateParse(String tableName, String jsonStr) {
-        return doWhat(tableName, jsonStr, (tn, row) -> {
+        return doFunction(tableName, jsonStr, (tn, row) -> {
             if (row.containsKey(Constant.WITH_SELECT)) {
                 mapper.update(tn, row);
                 return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
@@ -166,7 +186,7 @@ public class MyBatisApiService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Object insertOrUpdateParse(String tableName, String jsonStr) {
-        return doWhat(tableName, jsonStr, (tn, row) -> {
+        return doFunction(tableName, jsonStr, (tn, row) -> {
             Object id;
             if (!row.containsKey(myBatisApiProperties.getId()) || "".equals(row.get(myBatisApiProperties.getId()))) {
                 id = idService.generalID();
@@ -197,26 +217,32 @@ public class MyBatisApiService {
      * @param biFunction 双函数接口
      * @return 执行结果
      */
-    private Object doWhat(String tableName, String jsonStr, BiFunction<String, Map<String, Object>, Object> biFunction) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    private Object doFunction(String tableName, String jsonStr, BiFunction<String, Map<String, Object>, Object> biFunction) {
+        if (tableName == null || jsonStr == null) {
+            throw new MyBatisApiException("参数不能为空: tableName 或 jsonStr");
+        }
+
         try {
-            JsonNode rootNode = objectMapper.readValue(jsonStr, JsonNode.class);
+            JsonNode rootNode = OBJECT_MAPPER.readTree(jsonStr);
             if (rootNode.isArray()) {
                 // 如果根节点是一个数组
-                List<Map<String, Object>> rows = objectMapper.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
+                List<Map<String, Object>> rows = OBJECT_MAPPER.convertValue(rootNode, new TypeReference<List<Map<String, Object>>>() {
                 });
                 List<Object> objects = new ArrayList<>();
-                for (Map<String, Object> row : rows)
-                    objects.add(biFunction.apply(tableName, row));
+                for (Map<String, Object> row : rows) {
+                    if (row != null) {
+                        objects.add(biFunction.apply(tableName, row));
+                    }
+                }
                 return objects;
             } else {
                 // 如果根节点是一个对象
-                Map<String, Object> row = objectMapper.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
+                Map<String, Object> row = OBJECT_MAPPER.convertValue(rootNode, new TypeReference<Map<String, Object>>() {
                 });
                 return biFunction.apply(tableName, row);
             }
         } catch (JsonProcessingException e) {
-            throw new MyBatisApiException(e.getMessage(), e);
+            throw new MyBatisApiException("JSON 解析失败", e);
         }
     }
 
@@ -228,10 +254,22 @@ public class MyBatisApiService {
      * @return 处理后的结果集
      */
     private List<Map<String, Object>> mapParse(List<Map<String, Object>> list) {
+        if (list == null) {
+            return new ArrayList<>();
+        }
+
         return list.stream().map(map -> {
             Map<String, Object> newMap = new HashMap<>();
-            map.entrySet().stream().forEach(enrty -> newMap.put(mappingService.parseKey(enrty.getKey()), enrty.getValue()));
+            map.entrySet().forEach(entry -> {
+                try {
+                    newMap.put(mappingService.parseKey(entry.getKey()), entry.getValue());
+                } catch (Exception e) {
+                    // 处理 parseKey 可能抛出的异常
+                    newMap.put(entry.getKey(), entry.getValue());
+                }
+            });
             return newMap;
         }).collect(Collectors.toList());
     }
+
 }
