@@ -1,24 +1,30 @@
 # mybatis-api-spring-boot-starter
 
-> 基于mybatis提供万能通用接口，大部分接口不用再写，零码便可进行增删改查
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
+[![star](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
+[![fork](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
+[![star](https://img.shields.io/github/stars/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)
+[![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)  
+![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
+
+> 基于mybatis提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
 
 * ## [1.如何使用](#1)
 * ## [2.语法 & 示例](#2)
 * #### [2.1 新增](#2.1)
 * ###### [2.1.1 新增单条数据](#2.1.1)
 * ###### [2.1.2 新增批量数据](#2.1.2)
-* ###### [2.1.3 新增后返回数据](#2.1.3)
+* ###### [2.1.3 新增后按照查询返回数据](#2.1.3)
 * #### [2.2 修改](#2.2)
-* ###### [2.2.1 修改单查询数据](#2.2.1)
-* ###### [2.2.2 修改多查询数据](#2.2.2)
-* ###### [2.2.3 修改后返回数据](#2.2.3)
+* ###### [2.2.1 按照一个查询结果修改数据](#2.2.1)
+* ###### [2.2.2 按照多个查询结果修改数](#2.2.2)
+* ###### [2.2.3 修改后按照查询返回数据](#2.2.3)
 * #### [2.3 新增或修改](#2.3)
 * ###### [2.3.1 单条数据](#2.3.1)
 * ###### [2.3.2 批量数据](#2.3.2)
-* ###### [2.3.3 自定义主键名称](#2.3.3)
-* ###### [2.3.4 自定义生成主键值](#2.3.4)
+* ###### [2.3.3 如何自定义主键名称](#2.3.3)
+* ###### [2.3.4 如何自定义生成主键值](#2.3.4)
 * #### [2.4 查询](#2.4)
 * ###### [2.4.1 单表查询](#2.4.1)
 * ###### [2.4.2 分页查询](#2.4.2)
@@ -45,11 +51,12 @@
 ```
 
 #### 第二步 引入jar
+1.1.0版本后升级到jdk17 SpringBoot3+
 ```xml
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.0.6</version>
+        <version>1.1.0</version>
     </dependency>
 ```
 
@@ -100,7 +107,7 @@ public class MybatisApiDemoApplication {
 ```json
 2
 ```
-###### <h4 id="2.1.3">2.1.3 新增后返回数据<h3/>
+###### <h4 id="2.1.3">2.1.3 新增后按照查询返回数据<h3/>
 可使用@with_select添加查询条件返回数据  
 请求体
 ```json
@@ -133,7 +140,7 @@ public class MybatisApiDemoApplication {
 ## <h3 id="2.2">2.2 修改<h3/>
 > 根据查询条件修改数据  
 > 请求地址 http://ip:port/api/update/{tableName}
-###### <h4 id="2.2.1">2.2.1 修改单查询数据<h3/>
+###### <h4 id="2.2.1">2.2.1 按照一个查询结果修改数据<h3/>
 请求体
 ```json
 {
@@ -152,7 +159,7 @@ public class MybatisApiDemoApplication {
 ```json
 1
 ```
-###### <h4 id="2.2.2">2.2.2 修改多查询数据<h3/>
+###### <h4 id="2.2.2">2.2.2 按照多个查询结果修改数据<h3/>
 请求体
 ```json
 [
@@ -187,7 +194,7 @@ public class MybatisApiDemoApplication {
   1
 ]
 ```
-###### <h4 id="2.2.3">2.2.3 修改后返回数据<h3/>
+###### <h4 id="2.2.3">2.2.3 修改后按照查询返回数据<h3/>
 可使用@with_select添加查询条件返回数据
 请求体
 ```json
@@ -270,14 +277,14 @@ public class MybatisApiDemoApplication {
   }
 ]
 ```
-###### <h4 id="2.3.3">2.3.3 自定义主键名称<h3/>
+###### <h4 id="2.3.3">2.3.3 如何自定义主键名称<h3/>
 ```yaml
 mybatis:
   api:
-    id: id id #数据库主键名称，默认为id
+    id: id #数据库主键名称，默认为id
 ```
 
-###### <h4 id="2.3.4">2.3.4 自定义生成主键值<h3/>
+###### <h4 id="2.3.4">2.3.4 如何自定义生成主键值<h3/>
 继承IDService接口后实现generalID方法，并注册bean
 ```java
 @Component
@@ -442,12 +449,7 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
     }
 }
 ```
-修改配置
-```yaml
-mybatis:
-  api:
-    idClass: cn.wubo.mybatis.api.demo.SnowflakeIdServiceImpl #主键生成方法,默认使用uuid，示例为雪花算法
-```
+
 ## <h3 id="2.4">2.4 查询<h3/>
 > 请求地址 http://ip:port/api/select/{tableName}
 ###### <h4 id="2.4.1">2.4.1 单表查询<h3/>
@@ -534,7 +536,7 @@ mybatis:
 请求体
 ```json
 {
-  "@column": "person.id,person.name,person.deptcode,dept.name",
+  "@column": "person.id,person.name,person.deptcode,dept.name as deptname",
   "@where": [
     {
       "key": "person.id",
@@ -552,7 +554,8 @@ mybatis:
   {
     "deptcode": "deptcode1",
     "id": "001",
-    "name": "name1"
+    "name": "name1",
+    "deptname": "deptname1"
   }
 ]
 ```
@@ -613,12 +616,6 @@ public class CamelCaseMappingServiceImpl implements IMappingService {
     }
 }
 ```
-修改配置
-```yaml
-mybatis:
-  api:
-    mappingClass: cn.wubo.mybatis.api.demo.CamelCaseMappingServiceImpl #自定义结果集映射,默认转小写，示例为驼峰方式
-```
 
 ## <h3 id="2.5">2.5 删除<h3/>
 > 请求地址 http://ip:port/api/delete/{tableName}
@@ -673,12 +670,7 @@ public class ResponseResultServiceImpl implements IResultService<ResponseEntity<
     }
 }
 ```
-添加配置
-```yaml
-mybatis:
-  api:
-    resultClass: cn.wubo.mybatis.api.demo.ResponseResultServiceImpl #自定义统一响应转换,,默认不进行转换,示例为ResponseEntity
-```
+
 ## <h3 id="2.9">2.9 其他使用的方式<h3/>
 ```java
 // 注入MyBatisApiService

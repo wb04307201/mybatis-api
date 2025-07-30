@@ -1,4 +1,4 @@
-package cn.wubo.mybatis.api.core.result;
+package cn.wubo.mybatis.api.core.service.result;
 
 public interface IResultService<T> {
 

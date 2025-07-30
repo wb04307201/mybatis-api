@@ -1,14 +1,20 @@
 package cn.wubo.mybatis.api.config;
 
-import cn.wubo.mybatis.api.core.MyBatisApiService;
-import cn.wubo.mybatis.api.core.id.IDService;
-import cn.wubo.mybatis.api.core.id.impl.UUIDServiceImpl;
-import cn.wubo.mybatis.api.core.mapping.IMappingService;
-import cn.wubo.mybatis.api.core.mapping.impl.LowerCaseMappingServiceImpl;
-import cn.wubo.mybatis.api.core.result.IResultService;
-import cn.wubo.mybatis.api.core.result.impl.NoneResultServiceImpl;
+import cn.wubo.mybatis.api.core.mapper.MyBatisApiMapper;
+import cn.wubo.mybatis.api.core.service.MyBatisApiService;
+import cn.wubo.mybatis.api.core.service.id.IDService;
+import cn.wubo.mybatis.api.core.service.id.impl.DefaultIDServiceImpl;
+import cn.wubo.mybatis.api.core.service.mapping.IMappingService;
+import cn.wubo.mybatis.api.core.service.mapping.impl.DefaultMappingServiceImpl;
+import cn.wubo.mybatis.api.core.service.result.IResultService;
+import cn.wubo.mybatis.api.core.service.result.impl.DefaultResultServiceImpl;
 import cn.wubo.mybatis.api.exception.MyBatisApiException;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
+import org.mybatis.spring.mapper.MapperFactoryBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +24,14 @@ import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
 
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.springframework.web.servlet.function.RequestPredicates.accept;
 import static org.springframework.web.servlet.function.RouterFunctions.route;
 
 @Configuration
 @EnableConfigurationProperties({MyBatisApiProperties.class})
-@MapperScan(basePackages = "cn.wubo.mybatis.api.core")
+@MapperScan(basePackages = "cn.wubo.mybatis.api.core.mapper")
 public class MyBatisApiConfiguration {
 
     MyBatisApiProperties myBatisApiProperties;
@@ -35,41 +41,80 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public IDService<?> uuidService() {
-        return new UUIDServiceImpl();
+    @ConditionalOnMissingBean
+    public IDService<?> idService() {
+        return new DefaultIDServiceImpl();
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public IMappingService mappingService() {
+        return new DefaultMappingServiceImpl();
     }
 
     @Bean
-    public IMappingService lowerCaseMappingServiceImpl() {
-        return new LowerCaseMappingServiceImpl();
+    @ConditionalOnMissingBean
+    public IResultService<?> resultService() {
+        return new DefaultResultServiceImpl();
     }
 
+
+        /**
+     * 创建MyBatisApiService实例的Bean
+     *
+     * @param idService ID服务实例，用于生成唯一标识符
+     * @param mappingService 映射服务实例，用于数据映射转换
+     * @param resultService 结果服务实例，用于处理返回结果
+     * @return 配置好的MyBatisApiService实例
+     */
     @Bean
-    public IResultService<?> noneResultServiceImpl() {
-        return new NoneResultServiceImpl();
+    public MyBatisApiService myBatisApiService(IDService<?> idService, IMappingService mappingService, IResultService<?> resultService,MyBatisApiMapper mapper) {
+        return new MyBatisApiService(myBatisApiProperties, idService, mappingService, resultService, mapper);
     }
 
-    @Bean
-    public MyBatisApiService myBatisApiService(List<IDService<?>> idServices, List<IMappingService> mappingServices, List<IResultService<?>> iResultServices) {
-        IDService<?> idService = idServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getIdClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IDService！", myBatisApiProperties.getIdClass())));
-        IMappingService mappingService = mappingServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getMappingClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IMappingService！", myBatisApiProperties.getMappingClass())));
-        IResultService<?> resultService = iResultServices.stream().filter(is -> is.getClass().getName().equals(myBatisApiProperties.getResultClass())).findAny().orElseThrow(() -> new MyBatisApiException(String.format("未找到%s对应的bean，无法加载IResultService！", myBatisApiProperties.getResultClass())));
-        return new MyBatisApiService(myBatisApiProperties, idService, mappingService, resultService);
-    }
 
+    /**
+     * 注册一个Bean，用于路由MyBatisApiService的请求
+     *
+     * @param myBatisApiService MyBatisApiService对象
+     * @return 路由函数
+     */
     @Bean
     public RouterFunction<ServerResponse> myBatisApiRouter(MyBatisApiService myBatisApiService) {
         RouterFunctions.Builder builder = route();
-        if (Boolean.TRUE.equals(myBatisApiProperties.getEnableRouter())) {
-            if (!myBatisApiProperties.getBasePath().startsWith("/") || myBatisApiProperties.getBasePath().endsWith("/"))
-                throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
-            builder.POST(myBatisApiProperties.getBasePath() + "/{method}/{tableName}", accept(MediaType.APPLICATION_JSON), request -> {
-                String method = request.pathVariable("method");
-                String tableName = request.pathVariable("tableName");
-                return ServerResponse.status(HttpStatus.OK).body(myBatisApiService.parse(method, tableName, request.body(String.class)));
-            });
+
+        // 判断是否启用路由
+        if (!Boolean.TRUE.equals(myBatisApiProperties.getEnableRouter())) {
+            return builder.build();
         }
+
+        String basePath = myBatisApiProperties.getBasePath();
+
+        // 判断basePath是否以"/"开头，并且不以"/"结尾
+        if (!basePath.startsWith("/") || basePath.endsWith("/")) {
+            throw new MyBatisApiException("basePath must start with '/' and not end with '/'");
+        }
+
+        final String routePath = basePath + "/{method}/{tableName}";
+
+        // 处理POST请求
+        builder.POST(routePath, accept(MediaType.APPLICATION_JSON), request -> {
+            String method = request.pathVariable("method");
+            String tableName = request.pathVariable("tableName");
+
+            try {
+                // 调用MyBatisApiService的parse方法
+                return ServerResponse.ok()
+                        .body(myBatisApiService.parse(method, tableName, request.body(String.class)));
+            } catch (Exception e) {
+                // 异常处理：统一返回400错误
+                return ServerResponse.badRequest()
+                        .body("Internal Server Error: " + e.getMessage());
+            }
+        });
+
+        // 构建并返回路由函数
         return builder.build();
     }
-
 }

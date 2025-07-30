@@ -1,4 +1,4 @@
-package cn.wubo.mybatis.api.core.id;
+package cn.wubo.mybatis.api.core.service.id;
 
 public interface IDService<T> {
 
