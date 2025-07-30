@@ -105,11 +105,11 @@ public class MyBatisApiConfiguration {
 
             try {
                 // 调用MyBatisApiService的parse方法
-                return ServerResponse.status(HttpStatus.OK)
+                return ServerResponse.ok()
                         .body(myBatisApiService.parse(method, tableName, request.body(String.class)));
             } catch (Exception e) {
-                // 异常处理：统一返回500错误
-                return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                // 异常处理：统一返回400错误
+                return ServerResponse.badRequest()
                         .body("Internal Server Error: " + e.getMessage());
             }
         });
