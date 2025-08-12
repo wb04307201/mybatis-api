@@ -8,7 +8,7 @@
 [![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)  
 ![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
 
-> 基于mybatis提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
+> 提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
 
 * ## [1.如何使用](#1)
 * ## [2.语法 & 示例](#2)
