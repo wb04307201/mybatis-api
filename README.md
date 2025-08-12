@@ -60,6 +60,20 @@
     </dependency>
 ```
 
+#### 第三步 记得配置数据库信息,例如
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+```
+
+**启动项目，试试通过接口访问数据库吧**
+
+---
+
 ## <h2 id="2">2.语法 & 示例<h2/>
 [示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
 #### <h3 id="2.1">2.1 新增<h3/>
