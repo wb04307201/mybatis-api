@@ -1,5 +1,6 @@
 # mybatis-api
 
+> 提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
@@ -7,8 +8,6 @@
 [![star](https://img.shields.io/github/stars/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)
 [![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)  
 ![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
-
-> 提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
 
 * ## [1.如何使用](#1)
 * ## [2.语法 & 示例](#2)
@@ -59,6 +58,20 @@
         <version>1.1.1</version>
     </dependency>
 ```
+
+#### 第三步 记得配置数据库信息,例如
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+```
+
+**启动项目，试试通过接口访问数据库吧**
+
+---
 
 ## <h2 id="2">2.语法 & 示例<h2/>
 [示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
