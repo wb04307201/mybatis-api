@@ -1,4 +1,4 @@
-# mybatis-api-spring-boot-starter
+# mybatis-api
 
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
