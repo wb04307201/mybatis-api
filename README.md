@@ -35,7 +35,7 @@
 * #### [2.5 删除](#2.5)
 * #### [2.6 groovy](#2.6)
 * #### [2.7 请求基础路径](#2.7)
-* #### [2.8 自定义统一响应](#2.8)
+* #### [2.8 自定义响应格式](#2.8)
 * #### [2.9 其他使用的方式](#2.9)
 
 
@@ -56,21 +56,8 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </dependency>
-```
-
-#### 第三步 在启动类上加上`@EnableMyBatisApi`注解
-```java
-@EnableMyBatisApi
-@SpringBootApplication
-public class MybatisApiDemoApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(MybatisApiDemoApplication.class, args);
-    }
-
-}
 ```
 
 ## <h2 id="2">2.语法 & 示例<h2/>
@@ -659,7 +646,7 @@ mybatis:
   api:
     basePath: /api #访问接口基础路径,默认为/api
 ```
-## <h3 id="2.8">2.8 自定义统一响应<h3/>
+## <h3 id="2.8">2.8 自定义响应格式<h3/>
 继承IResultService接口后实现generalResult方法，并注册bean
 ```java
 @Component
