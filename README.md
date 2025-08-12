@@ -1,6 +1,6 @@
 # mybatis-api
 
-> 提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
+> 提供通用API接口，引入依赖，零代码便可进行增删改查
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
