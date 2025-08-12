@@ -1,11 +1,11 @@
 # mybatis-api-spring-boot-starter
 
 
-[![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
-[![star](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
-[![fork](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
-[![star](https://img.shields.io/github/stars/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)
-[![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)  
+[![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
+[![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
+[![fork](https://gitee.com/wb04307201/mybatis-api/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
+[![star](https://img.shields.io/github/stars/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)
+[![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)  
 ![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
 
 > 基于mybatis提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
