@@ -4,15 +4,11 @@ import cn.wubo.mybatis.api.PageVO;
 import cn.wubo.mybatis.api.service.MyBatisApiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -30,22 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MybatisApiTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
     private DataSource dataSource;
-
-    private MockMvc mockMvc;
 
     @Autowired
     private MyBatisApiService myBatisApiService;
-
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addDispatcherServletCustomizer(dispatcherServlet -> {
-            dispatcherServlet.setDispatchOptionsRequest(true);
-        }).build();
-    }
 
 
     @Test
@@ -178,7 +162,6 @@ public class MybatisApiTest {
         result = myBatisApiService.parse("insertOrUpdate", "person", objectMapper.writeValueAsString(Map.of("code(G)", "import java.time.LocalDateTime;import java.time.format.DateTimeFormatter;return LocalDateTime.now().format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))", "name", "88888")));
         log.info("groovy {}", result);
         assertEquals(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), ((Map<String, Object>) result).get("code"));
-
 
     }
 
