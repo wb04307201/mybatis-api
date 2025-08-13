@@ -55,7 +55,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.1.2</version>
+        <version>1.1.3</version>
     </dependency>
 ```
 
