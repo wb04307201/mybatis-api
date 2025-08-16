@@ -1,6 +1,6 @@
 # mybatis-api
 
-> 提供通用API接口，引入依赖，通过 JSON 参数执行常见的数据库操作（如查询、插入、更新、删除等）
+> 提供通用API接口，引入依赖，通过 JSON 参数执行常见的数据库操作（查询、插入、更新、删除）
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
