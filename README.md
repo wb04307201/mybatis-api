@@ -1,6 +1,6 @@
 # mybatis-api
 
-> 提供通用API接口，引入依赖，零代码便可拥有增删改查接口
+> 提供通用API接口，引入依赖，通过 JSON 参数执行常见的数据库操作（如查询、插入、更新、删除等）
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
@@ -9,8 +9,17 @@
 [![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)  
 ![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
 
+## 功能特性
+
+- **通用 CRUD 操作**：支持通过 JSON 参数执行 select、insert、update、delete 操作
+- **动态 SQL 构建**：自动构建 SQL 语句，支持连接查询、排序、分组、去重等操作
+- **分页查询**：内置分页支持，自动计算分页参数
+- **安全机制**：集成 SQL 注入检查，防止恶意 SQL 注入攻击
+- **灵活扩展**：支持自定义 ID 生成策略、字段映射策略和结果处理策略
+- **事务支持**：所有操作均在事务中执行，确保数据一致性
+
 * ## [1.如何使用](#1)
-* ## [2.语法 & 示例](#2)
+* ## [2.语法 ](#2)
 * #### [2.1 新增](#2.1)
 * ###### [2.1.1 新增单条数据](#2.1.1)
 * ###### [2.1.2 新增批量数据](#2.1.2)
@@ -73,8 +82,7 @@ spring:
 
 ---
 
-## <h2 id="2">2.语法 & 示例<h2/>
-[示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
+## <h2 id="2">2.语法 <h2/>
 #### <h3 id="2.1">2.1 新增<h3/>
 > 请求地址 http://ip:port/api/insert/{tableName}
 ###### <h4 id="2.1.1">2.1.1 新增单条数据<h3/>
