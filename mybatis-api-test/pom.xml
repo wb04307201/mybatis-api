@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.gitee.wb04307201</groupId>
-            <artifactId>mybatis-api-spring-boot-autoconfigure</artifactId>
+            <artifactId>mybatis-api-spring-boot-starter</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -24,7 +24,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>2.2.224</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

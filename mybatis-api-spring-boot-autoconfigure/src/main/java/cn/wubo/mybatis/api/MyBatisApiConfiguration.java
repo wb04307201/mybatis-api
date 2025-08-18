@@ -46,7 +46,7 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MapperFactoryBean<MyBatisApiMapper> myBatisApiMapperMapperFactoryBean(SqlSessionFactory sqlSessionFactory) throws Exception {
+    public MapperFactoryBean<MyBatisApiMapper> myBatisApiMapperMapperFactoryBean(SqlSessionFactory sqlSessionFactory) {
         MapperFactoryBean<MyBatisApiMapper> factoryBean = new MapperFactoryBean<>(MyBatisApiMapper.class);
         factoryBean.setSqlSessionFactory(sqlSessionFactory);
         return factoryBean;

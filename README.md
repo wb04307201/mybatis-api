@@ -296,7 +296,7 @@ mybatis:
 继承IDService接口后实现generalID方法，并注册bean
 ```java
 @Component
-public class SnowflakeIdServiceImpl implements IDService<Long> {
+public class cn.wubo.entity.sql.SnowflakeIdServiceImpl implements IDService<Long> {
 
     // ==============================Fields===========================================
     /**
@@ -371,7 +371,7 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 
     //==============================Constructors=====================================
 
-    public SnowflakeIdServiceImpl() {
+    public cn.wubo.entity.sql.SnowflakeIdServiceImpl() {
         this.workerId = 0L;
         this.dataCenterId = 0L;
     }
@@ -382,7 +382,7 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
      * @param workerId     工作ID (0~31)
      * @param dataCenterId 数据中心ID (0~31)
      */
-    public SnowflakeIdServiceImpl(long workerId, long dataCenterId) {
+    public cn.wubo.entity.sql.SnowflakeIdServiceImpl(long workerId, long dataCenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));
         }
@@ -616,7 +616,7 @@ Content-Type: application/json
 集成IMappingService接口并实现parseKey方法
 ```java
 @Component
-public class CamelCaseMappingServiceImpl implements IMappingService {
+public class cn.wubo.entity.sql.CamelCaseMappingServiceImpl implements IMappingService {
     @Override
     public String parseKey(String field) {
         String[] words = field.split("[-_]");
@@ -671,7 +671,7 @@ mybatis:
 继承IResultService接口后实现generalResult方法，并注册bean
 ```java
 @Component
-public class ResponseResultServiceImpl implements IResultService<ResponseEntity<?>> {
+public class cn.wubo.entity.sql.ResponseResultServiceImpl implements IResultService<ResponseEntity<?>> {
     @Override
     public ResponseEntity<?> generalResult(Object o) {
         return ResponseEntity.ok(o);

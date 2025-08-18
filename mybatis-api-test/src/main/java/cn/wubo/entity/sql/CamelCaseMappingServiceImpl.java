@@ -1,3 +1,5 @@
+package cn.wubo.entity.sql;
+
 import cn.wubo.mybatis.api.service.mapping.IMappingService;
 import org.springframework.stereotype.Component;
 
