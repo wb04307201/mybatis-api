@@ -1,4 +1,4 @@
-package cn.wubo.entity.sql;
+package cn.wubo.mybatis.api;
 
 import cn.wubo.mybatis.api.service.result.IResultService;
 import org.springframework.http.ResponseEntity;

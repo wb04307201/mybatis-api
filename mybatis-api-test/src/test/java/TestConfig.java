@@ -1,6 +1,6 @@
-import cn.wubo.entity.sql.CamelCaseMappingServiceImpl;
-import cn.wubo.entity.sql.ResponseResultServiceImpl;
-import cn.wubo.entity.sql.SnowflakeIdServiceImpl;
+import cn.wubo.mybatis.api.CamelCaseMappingServiceImpl;
+import cn.wubo.mybatis.api.ResponseResultServiceImpl;
+import cn.wubo.mybatis.api.SnowflakeIdServiceImpl;
 import cn.wubo.mybatis.api.service.id.IDService;
 import cn.wubo.mybatis.api.service.mapping.IMappingService;
 import cn.wubo.mybatis.api.service.result.IResultService;

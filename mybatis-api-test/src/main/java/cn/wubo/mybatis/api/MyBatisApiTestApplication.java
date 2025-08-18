@@ -1,4 +1,4 @@
-package cn.wubo.entity.sql;
+package cn.wubo.mybatis.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

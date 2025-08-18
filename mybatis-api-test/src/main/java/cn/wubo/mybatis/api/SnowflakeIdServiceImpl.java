@@ -1,4 +1,4 @@
-package cn.wubo.entity.sql;
+package cn.wubo.mybatis.api;
 
 import cn.wubo.mybatis.api.service.id.IDService;
 import org.springframework.stereotype.Component;
