@@ -1,17 +1,25 @@
-# mybatis-api-spring-boot-starter
+# mybatis-api
 
+> 提供通用API接口，引入依赖，通过 JSON 参数执行常见的数据库操作（查询、插入、更新、删除）
 
-[![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api-spring-boot-starter)
-[![star](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
-[![fork](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api-spring-boot-starter)
-[![star](https://img.shields.io/github/stars/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)
-[![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api-spring-boot-starter)](https://github.com/wb04307201/mybatis-api-spring-boot-starter)  
+[![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
+[![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
+[![fork](https://gitee.com/wb04307201/mybatis-api/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
+[![star](https://img.shields.io/github/stars/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)
+[![fork](https://img.shields.io/github/forks/wb04307201/mybatis-api)](https://github.com/wb04307201/mybatis-api)  
 ![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
 
-> 提供万能通用接口，大部分接口不用再写，零代码便可进行增删改查
+## 功能特性
+
+- **通用 CRUD 操作**：支持通过 JSON 参数执行 select、insert、update、delete 操作
+- **动态 SQL 构建**：自动构建 SQL 语句，支持连接查询、排序、分组、去重等操作
+- **分页查询**：内置分页支持，自动计算分页参数
+- **安全机制**：集成 SQL 注入检查，防止恶意 SQL 注入攻击
+- **灵活扩展**：支持自定义 ID 生成策略、字段映射策略和结果处理策略
+- **事务支持**：所有操作均在事务中执行，确保数据一致性
 
 * ## [1.如何使用](#1)
-* ## [2.语法 & 示例](#2)
+* ## [2.语法 ](#2)
 * #### [2.1 新增](#2.1)
 * ###### [2.1.1 新增单条数据](#2.1.1)
 * ###### [2.1.2 新增批量数据](#2.1.2)
@@ -56,12 +64,25 @@
     <dependency>
         <groupId>com.gitee.wb04307201.mybatis-api</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.1.1</version>
+        <version>1.1.3</version>
     </dependency>
 ```
 
-## <h2 id="2">2.语法 & 示例<h2/>
-[示例代码](https://gitee.com/wb04307201/mybatis-api-demo)
+#### 第三步 记得配置数据库信息,例如
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+```
+
+**启动项目，试试通过接口访问数据库吧**
+
+---
+
+## <h2 id="2">2.语法 <h2/>
 #### <h3 id="2.1">2.1 新增<h3/>
 > 请求地址 http://ip:port/api/insert/{tableName}
 ###### <h4 id="2.1.1">2.1.1 新增单条数据<h3/>
