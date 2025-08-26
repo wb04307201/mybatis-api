@@ -59,7 +59,6 @@
 ```
 
 #### 第二步 引入jar
-1.1.0版本后升级到jdk17 SpringBoot3+
 ```xml
     <dependency>
         <groupId>com.gitee.wb04307201.mybatis-api</groupId>
