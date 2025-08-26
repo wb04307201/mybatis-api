@@ -59,12 +59,11 @@
 ```
 
 #### 第二步 引入jar
-1.1.0版本后升级到jdk17 SpringBoot3+
 ```xml
     <dependency>
         <groupId>com.gitee.wb04307201.mybatis-api</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.1.3</version>
+        <version>1.1.4</version>
     </dependency>
 ```
 
@@ -371,7 +370,7 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
 
     //==============================Constructors=====================================
 
-    public SnowflakeIdServiceImpl() {
+    public cn.wubo.mybatis.api.SnowflakeIdServiceImpl() {
         this.workerId = 0L;
         this.dataCenterId = 0L;
     }
@@ -382,7 +381,7 @@ public class SnowflakeIdServiceImpl implements IDService<Long> {
      * @param workerId     工作ID (0~31)
      * @param dataCenterId 数据中心ID (0~31)
      */
-    public SnowflakeIdServiceImpl(long workerId, long dataCenterId) {
+    public cn.wubo.mybatis.api.SnowflakeIdServiceImpl(long workerId, long dataCenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));
         }

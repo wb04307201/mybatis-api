@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
@@ -46,7 +47,7 @@ public class MyBatisApiConfiguration {
     }
 
     @Bean
-    public MapperFactoryBean<MyBatisApiMapper> myBatisApiMapperMapperFactoryBean(SqlSessionFactory sqlSessionFactory) throws Exception {
+    public MapperFactoryBean<MyBatisApiMapper> myBatisApiMapperMapperFactoryBean(SqlSessionFactory sqlSessionFactory) {
         MapperFactoryBean<MyBatisApiMapper> factoryBean = new MapperFactoryBean<>(MyBatisApiMapper.class);
         factoryBean.setSqlSessionFactory(sqlSessionFactory);
         return factoryBean;
@@ -72,7 +73,7 @@ public class MyBatisApiConfiguration {
      * @param myBatisApiService MyBatisApiService对象
      * @return 路由函数
      */
-    @Bean
+    @Bean("wb04307201MyBatisApiRouter")
     public RouterFunction<ServerResponse> myBatisApiRouter(MyBatisApiProperties properties, MyBatisApiService myBatisApiService) {
         RouterFunctions.Builder builder = route();
 
@@ -99,8 +100,7 @@ public class MyBatisApiConfiguration {
                 // 调用MyBatisApiService的parse方法
                 return ServerResponse.ok().body(myBatisApiService.parse(method, tableName, request.body(String.class)));
             } catch (Exception e) {
-                // 异常处理：统一返回400错误
-                return ServerResponse.badRequest().body("Internal Server Error: " + e.getMessage());
+                return ServerResponse.badRequest().body(e.getMessage());
             }
         });
 

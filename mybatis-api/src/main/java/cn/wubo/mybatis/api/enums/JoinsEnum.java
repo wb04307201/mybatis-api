@@ -1,6 +1,6 @@
-package cn.wubo.mybatis.api;
+package cn.wubo.mybatis.api.enums;
 
-public enum MatchJoins {
+public enum JoinsEnum {
 
     JOIN,
     INNER_JOIN,

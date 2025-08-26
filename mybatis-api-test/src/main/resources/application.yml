@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./mybatis-api-test/data/testdb;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+mybatis:
+  api:
+    basePath: /api #访问接口基础路径,默认为/api
+    id: id #数据库主键名称，默认为id

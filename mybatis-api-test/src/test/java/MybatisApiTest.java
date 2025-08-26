@@ -1,4 +1,4 @@
-import cn.wubo.mybatis.api.Builder;
+import cn.wubo.mybatis.api.builder.Builder;
 import cn.wubo.mybatis.api.MyBatisApiConfiguration;
 import cn.wubo.mybatis.api.PageVO;
 import cn.wubo.mybatis.api.service.MyBatisApiService;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Slf4j
 @SpringBootTest(classes = {DataSourceConfig.class, MybatisAutoConfiguration.class, MyBatisApiConfiguration.class})
 @TestPropertySource(locations = "classpath:application.yml")
-public class MybatisApiTest {
+class MybatisApiTest {
 
     @Autowired
     private DataSource dataSource;
@@ -31,9 +31,8 @@ public class MybatisApiTest {
     @Autowired
     private MyBatisApiService myBatisApiService;
 
-
     @Test
-    public void testBuilder() {
+    void testBuilder() {
         Builder builder = new Builder();
 
         String sql = builder.insert("person", Map.of("code", "11111", "name", "11111"));
@@ -58,7 +57,7 @@ public class MybatisApiTest {
     }
 
     @Test
-    public void testApi() throws Exception {
+    void testApi() throws Exception {
         Connection connection = dataSource.getConnection();
 
         connection.createStatement().execute("DROP TABLE IF EXISTS person");

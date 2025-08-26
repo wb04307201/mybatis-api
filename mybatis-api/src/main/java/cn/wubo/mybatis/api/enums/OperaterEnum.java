@@ -1,6 +1,6 @@
-package cn.wubo.mybatis.api;
+package cn.wubo.mybatis.api.enums;
 
-public enum MatchParams {
+public enum OperaterEnum {
 
     EQ(" = "),
     UEQ(" <> "),
@@ -21,7 +21,7 @@ public enum MatchParams {
 
     private String value;
 
-    MatchParams(String value) {
+    OperaterEnum(String value) {
         this.value = value;
     }
 
@@ -29,7 +29,7 @@ public enum MatchParams {
         return value;
     }
 
-    public static MatchParams search(String name) {
-        return MatchParams.valueOf(name.toUpperCase());
+    public static OperaterEnum search(String name) {
+        return OperaterEnum.valueOf(name.toUpperCase());
     }
 }

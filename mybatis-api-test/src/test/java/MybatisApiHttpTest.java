@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {TestConfig.class, DataSourceConfig.class, MybatisAutoConfiguration.class, MyBatisApiConfiguration.class, WebMvcAutoConfiguration.class})
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application.yml")
-public class MybatisApiHttpTest {
+class MybatisApiHttpTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +34,7 @@ public class MybatisApiHttpTest {
 
 
     @Test
-    public void testHtttp() throws Exception {
+    void testHtttp() throws Exception {
         Connection connection = dataSource.getConnection();
 
         connection.createStatement().execute("DROP TABLE IF EXISTS person");

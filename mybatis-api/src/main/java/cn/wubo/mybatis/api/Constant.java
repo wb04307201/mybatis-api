@@ -14,9 +14,14 @@ public class Constant {
     public static final String ORDER = "@order";
     public static final String DISTINCT = "@distinct";
     public static final String QUOTATION = "'";
+    public static final String LEFT_LIKE = "'%";
+    public static final String RIGHT_lIKE = "%'";
+    public static final String LEFT_UPPER = "upper(";
+    public static final String RIGHT_UPPER = ")";
     public static final String AT = "@";
     public static final String PAGE_INDEX = "pageIndex";
     public static final String PAGE_SIZE = "pageSize";
     public static final String CONDITION = "condition";
+    public static final String KEY = "key";
     public static final String VALUE = "value";
 }
