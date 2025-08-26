@@ -1,6 +1,6 @@
-# mybatis-api
+# Mybatis API - 通用 API 接口
 
-> MyBatis API 是一个基于 MyBatis 的通用数据访问层框架，提供了一套简洁的 API 来操作数据库，支持动态 SQL 构建、分页查询、条件查询等功能。
+> MyBatis API 是一个基于 MyBatis 的通用数据访问层框架，提供了通过 JSON 参数动态构建 SQL 语句的能力。该项目允许开发者通过简单的 JSON 配置来执行常见的数据库操作（增删改查），而无需编写具体的 Mapper XML 文件。
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
