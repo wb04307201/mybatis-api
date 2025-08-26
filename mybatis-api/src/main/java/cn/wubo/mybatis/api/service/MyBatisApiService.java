@@ -7,6 +7,7 @@ import cn.wubo.mybatis.api.PageVO;
 import cn.wubo.mybatis.api.service.id.IDService;
 import cn.wubo.mybatis.api.service.mapping.IMappingService;
 import cn.wubo.mybatis.api.service.result.IResultService;
+import cn.wubo.mybatis.api.util.InputValidationUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,6 +20,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static cn.wubo.mybatis.api.Constant.VALUE;
+import static cn.wubo.mybatis.api.Constant.WITH_SELECT;
 
 public class MyBatisApiService {
 
@@ -50,13 +52,11 @@ public class MyBatisApiService {
     public Object parse(String method, String tableName, String jsonStr) {
         // 参数校验
         if (method == null || method.trim().isEmpty()) {
-            throw new MyBatisApiException("method cannot be null or empty");
+            throw new IllegalArgumentException("method cannot be null or empty");
         }
-        if (tableName == null || tableName.trim().isEmpty()) {
-            throw new MyBatisApiException("tableName cannot be null or empty");
-        }
+        InputValidationUtils.validateTableName(tableName);
         if (jsonStr == null || jsonStr.trim().isEmpty()) {
-            throw new MyBatisApiException("jsonStr cannot be null or empty");
+            throw new IllegalArgumentException("jsonStr cannot be null or empty");
         }
 
         Object r;
@@ -78,7 +78,7 @@ public class MyBatisApiService {
                     r = deleteParse(tableName, jsonStr);
                     break;
                 default:
-                    throw new MyBatisApiException(String.format("method [%s] value not valid", method));
+                    throw new IllegalArgumentException(String.format("method [%s] value not valid", method));
             }
         } catch (Exception e) {
             // 重新抛出异常以确保事务回滚，并保持异常信息
@@ -95,6 +95,7 @@ public class MyBatisApiService {
      * @param jsonStr   包含查询参数的JSON字符串
      * @return 查询结果
      */
+    @Transactional(rollbackFor = Exception.class)
     public Object selectParse(String tableName, String jsonStr) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -139,9 +140,9 @@ public class MyBatisApiService {
     @Transactional(rollbackFor = Exception.class)
     public Object deleteParse(String tableName, String jsonStr) {
         return doFunction(tableName, jsonStr, (tn, row) -> {
-            if (row.containsKey(Constant.WITH_SELECT)) {
+            if (row.containsKey(WITH_SELECT)) {
                 mapper.delete(tn, row);
-                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(WITH_SELECT)));
             } else {
                 return mapper.delete(tn, row);
             }
@@ -155,9 +156,9 @@ public class MyBatisApiService {
     @Transactional(rollbackFor = Exception.class)
     public Object insertParse(String tableName, String jsonStr) {
         return doFunction(tableName, jsonStr, (tn, row) -> {
-            if (row.containsKey(Constant.WITH_SELECT)) {
+            if (row.containsKey(WITH_SELECT)) {
                 mapper.insert(tn, row);
-                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(WITH_SELECT)));
             } else {
                 return mapper.insert(tn, row);
             }
@@ -170,9 +171,9 @@ public class MyBatisApiService {
     @Transactional(rollbackFor = Exception.class)
     public Object updateParse(String tableName, String jsonStr) {
         return doFunction(tableName, jsonStr, (tn, row) -> {
-            if (row.containsKey(Constant.WITH_SELECT)) {
+            if (row.containsKey(WITH_SELECT)) {
                 mapper.update(tn, row);
-                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(Constant.WITH_SELECT)));
+                return mapParse(mapper.select(tn, (Map<String, Object>) row.get(WITH_SELECT)));
             } else {
                 return mapper.update(tn, row);
             }

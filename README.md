@@ -1,6 +1,6 @@
 # mybatis-api
 
-> 提供通用API接口，引入依赖，通过 JSON 参数执行常见的数据库操作（查询、插入、更新、删除）
+> MyBatis API 是一个基于 MyBatis 的通用数据访问层框架，提供了一套简洁的 API 来操作数据库，支持动态 SQL 构建、分页查询、条件查询等功能。
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/mybatis-api.svg)](https://jitpack.io/#com.gitee.wb04307201/mybatis-api)
 [![star](https://gitee.com/wb04307201/mybatis-api/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/mybatis-api)
@@ -64,7 +64,7 @@
     <dependency>
         <groupId>com.gitee.wb04307201.mybatis-api</groupId>
         <artifactId>mybatis-api-spring-boot-starter</artifactId>
-        <version>1.1.3</version>
+        <version>1.1.4</version>
     </dependency>
 ```
 

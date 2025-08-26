@@ -11,22 +11,22 @@ public class SqlInjectionUtils {
     private SqlInjectionUtils() {
     }
 
-    /**
- * 检查给定的字符串是否包含SQL注释或语法
- *
- * @param value 待检查的字符串
- * @return 如果字符串包含SQL注释或语法则返回true，否则返回false
- */
-public static boolean check(String value) {
-    Objects.requireNonNull(value);
-    if (value.isEmpty()) {
-        return false;
-    }
-    if (SQL_COMMENT_PATTERN.matcher(value).find()) {
-        return true;
-    }
-    return SQL_SYNTAX_PATTERN.matcher(value).find();
-}
+        /**
+     * 检查输入值是否为空，并对字符串类型的值进行SQL注入攻击检测
+     * @param value 待检查的值，不能为null
+     * @throws IllegalArgumentException 当检测到SQL注入攻击时抛出
+     */
+    public static void check(Object value) {
+        // 检查参数是否为null
+        Objects.requireNonNull(value);
 
+        // 对字符串类型的值进行SQL注入攻击检测
+        if (value instanceof String str) {
+            // 使用正则表达式匹配SQL语法关键字，如果匹配成功则抛出异常
+            if (SQL_SYNTAX_PATTERN.matcher(str).find() || SQL_COMMENT_PATTERN.matcher(str).find()){
+                throw new IllegalArgumentException("SQL injection attack detected");
+            }
+        }
+    }
 
 }
